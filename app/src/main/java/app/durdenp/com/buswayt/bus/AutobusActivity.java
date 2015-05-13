@@ -1,4 +1,4 @@
-package app.durdenp.com.buswayt.app.durdenp.com.buswayt.bus;
+package app.durdenp.com.buswayt.bus;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;

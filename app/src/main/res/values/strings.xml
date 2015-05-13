@@ -7,4 +7,5 @@
     <string name="title_activity_autobus">AutobusActivity</string>
     <string name="title_activity_client">ClientActivity</string>
     <string name="title_activity_bus_config">BusConfigActivity</string>
+
 </resources>

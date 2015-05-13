@@ -1,4 +1,4 @@
-package app.durdenp.com.buswayt.app.durdenp.com.buswayt.service;
+package app.durdenp.com.buswayt.service;
 
 import android.app.Service;
 import android.content.Intent;

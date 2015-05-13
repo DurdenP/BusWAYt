@@ -1,4 +1,4 @@
-package app.durdenp.com.buswayt.app.durdenp.com.buswayt.bus;
+package app.durdenp.com.buswayt.bus;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -9,7 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.Switch;
 import android.widget.Toast;
 
 import app.durdenp.com.buswayt.R;

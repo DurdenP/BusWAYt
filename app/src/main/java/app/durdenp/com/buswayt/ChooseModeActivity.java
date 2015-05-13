@@ -7,9 +7,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import app.durdenp.com.buswayt.app.durdenp.com.buswayt.bus.AutobusActivity;
-import app.durdenp.com.buswayt.app.durdenp.com.buswayt.bus.BusConfigActivity;
-import app.durdenp.com.buswayt.app.durdenp.com.buswayt.client.ClientActivity;
+import app.durdenp.com.buswayt.bus.BusConfigActivity;
+import app.durdenp.com.buswayt.client.ClientActivity;
 
 
 public class ChooseModeActivity extends ActionBarActivity {
