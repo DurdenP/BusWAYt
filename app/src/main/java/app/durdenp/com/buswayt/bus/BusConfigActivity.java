@@ -1,5 +1,6 @@
 package app.durdenp.com.buswayt.bus;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
@@ -84,6 +85,9 @@ public class BusConfigActivity extends ActionBarActivity {
         }
 
 
+
+        Intent autobus= new Intent(this, AutobusActivity.class);
+        startActivity(autobus);
         /*bind to sLocalization Service*/
 
 
