@@ -49,7 +49,7 @@
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDKmwLXk4ify6J0ZVIj1AzF0Wzd2bOQug0" />
+            android:value="AIzaSyAg-99bfINtKg6ep0RNkDffiG8Xrpc-W2Y" />
 
 
         <activity
@@ -59,3 +59,6 @@
     </application>
 
 </manifest>
+
+
+<!--DurdenP API KEY: AIzaSyAg-99bfINtKg6ep0RNkDffiG8Xrpc-W2Y -->
