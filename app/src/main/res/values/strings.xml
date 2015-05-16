@@ -13,4 +13,6 @@
     <string name="btn_start_location_updates">START LOCATION UPDATES</string>
     <string name="btn_stop_location_updates">STOP LOCATION UPDATES</string>
 
+    <string name="hello_blank_fragment">Impostazioni linea</string>
+
 </resources>

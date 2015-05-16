@@ -6,6 +6,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -23,20 +24,13 @@ import java.util.ArrayList;
 import app.durdenp.com.buswayt.R;
 
 
-public class ClientActivity extends ActionBarActivity {
+public class ClientActivity extends ActionBarActivity implements RequestLineaFragment.OnFragmentInteractionListener {
 
     private GoogleMap googleMap;
-    /*
-    private LatLng posMark1 = new LatLng(37.524940, 15.073690);
-    private LatLng posMark2 = new LatLng(40.524940, 18.073690);
-    */
+
     private ArrayList<LatLng> posMarkArray = new ArrayList<>();
     private ArrayList<Marker> markerArray = new ArrayList<>();
 
-    /*
-    private Marker marker;
-    private Marker marker2;
-    */
 
     private LocationManager locationManager;
     private LocationListener listenerFine;
@@ -45,6 +39,11 @@ public class ClientActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client);
+
+        RequestLineaFragment lineaFragment = new RequestLineaFragment();
+        lineaFragment.setArguments(getIntent().getExtras());
+
+        getFragmentManager().beginTransaction().add(R.id.linearlayout02, lineaFragment).commit();
 
         posMarkArray.add(new LatLng(37.524940, 15.073690));
         posMarkArray.add(new LatLng(37.526340, 15.075090));
@@ -60,22 +59,22 @@ public class ClientActivity extends ActionBarActivity {
         if (googleMap != null) {
 
             //Focalizziamo la mappa su un punto prefissato
-            /* MARCO
+
             if(!posMarkArray.isEmpty()) {
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(posMarkArray.get(0), 10));
             }else{
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.524940, 15.073690), 10));
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.524940, 15.073690), 15));
             }
-            */
 
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.524940, 15.073690), 10));
+
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.524940, 15.073690), 15));
             //Aggiungiamo i marker
-            /* MARCO
+
             for(int i = 0; i < posMarkArray.size() ; i++){
                 markerArray.add(googleMap.addMarker(new MarkerOptions()
                         .position(posMarkArray.get(i)).title("Marker_"+i)));
             }
-            */
+
 
         } else {
             GooglePlayServicesUtil.getErrorDialog(
@@ -160,19 +159,19 @@ public class ClientActivity extends ActionBarActivity {
 
             //azione da eseguire ad ogni variazione della posizione
             public void onLocationChanged(Location location) {
-                /*
+
                 for(int i = 0; i<posMarkArray.size(); i++){
-                    double tmp = i*0.03;
+                    double tmp = i*0.00003;
                     posMarkArray.set(i, new LatLng(location.getLatitude()+tmp, location.getLongitude()+tmp));
                 }
-                */
+
                 if (googleMap != null) {
-                    /*
+
                     //Focalizziamo la mappa su un punto prefissato
                     if(!posMarkArray.isEmpty()) {
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(posMarkArray.get(0), 10));
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(posMarkArray.get(0), 15));
                     }else{
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.524940, 15.073690), 10));
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.524940, 15.073690), 15));
                     }
 
                     //Rimuoviamo vecchio marker
@@ -185,7 +184,7 @@ public class ClientActivity extends ActionBarActivity {
                         markerArray.add(googleMap.addMarker(new MarkerOptions()
                                 .position(posMarkArray.get(i)).title("Marker_"+i)));
                     }
-                    */
+
                 }
             }
         };
@@ -208,5 +207,18 @@ public class ClientActivity extends ActionBarActivity {
         //cancello la sottoscrizione al location listener
         locationManager.removeUpdates(listenerFine);
 
+    }
+
+    @Override
+    public void onFragmentInteraction(String cmd, String[] arguments) {
+        Log.d("onFragmentInteraction", cmd);
+        switch(cmd){
+            case "traceLinea":
+                String message = "città: " + arguments[0] + " linea: " + arguments[1];
+                Toast toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+                toast.show();
+                break;
+
+        }
     }
 }
