@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="linea_nessunaCitta_array">
+        <item>Seleziona prima città</item>
+    </string-array>
+
+    <string-array name="linea_catania_array">
+        <item>201</item>
+        <item>259</item>
+        <item>BRT-1</item>
+        <item>2-5</item>
+        <item>258</item>
+    </string-array>
+
+    <string-array name="linea_palermo_array">
+        <item>301</item>
+        <item>359</item>
+        <item>BRT-2</item>
+        <item>3-5</item>
+        <item>358</item>
+    </string-array>
+
+    <string-array name="linea_messina_array">
+        <item>401</item>
+        <item>459</item>
+        <item>BRT-3</item>
+        <item>4-5</item>
+        <item>458</item>
+    </string-array>
+
+</resources>

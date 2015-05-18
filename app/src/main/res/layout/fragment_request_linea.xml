@@ -29,7 +29,7 @@
         android:layout_toEndOf="@+id/cityChooseLabel" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Seleziona Linea:"
         android:id="@+id/lineaChooseLabel"
@@ -39,11 +39,12 @@
         android:textSize="25dp" />
 
     <Spinner
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/lineaChooseSpinner"
         android:layout_alignTop="@+id/lineaChooseLabel"
-        android:layout_toEndOf="@+id/lineaChooseLabel" />
+        android:layout_alignParentEnd="true"
+        android:layout_alignStart="@+id/cityChooseSpinner" />
 
     <Button
         android:layout_width="wrap_content"

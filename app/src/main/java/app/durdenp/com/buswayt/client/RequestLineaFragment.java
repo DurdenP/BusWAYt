@@ -4,10 +4,17 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import app.durdenp.com.buswayt.R;
 
@@ -30,6 +37,15 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
     private String mParam2;
 
     private Button traceLineaButton;
+    private Spinner citySpinner;
+    private Spinner lineaSpinner;
+
+    ArrayAdapter<CharSequence> citySpinnerAdapter;
+    ArrayAdapter<CharSequence> lineaSpinnerAdapter;
+    private String[] lineaBusArray;
+
+    private String citySelected;
+    private String lineaSelected;
 
     private OnFragmentInteractionListener mListener;
 
@@ -68,24 +84,29 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
         View view = inflater.inflate(R.layout.fragment_request_linea, container, false);
+
+        citySpinner = (Spinner) view.findViewById(R.id.cityChooseSpinner);
+
+        citySpinnerAdapter = ArrayAdapter.createFromResource(getActivity(), R.array.city_array, android.R.layout.simple_spinner_item);
+        citySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        citySpinner.setAdapter(citySpinnerAdapter);
+        citySpinner.setOnItemSelectedListener(new CitySpinnerListener());
+
+        lineaSpinner = (Spinner) view.findViewById(R.id.lineaChooseSpinner);
+        lineaBusArray = getResources().getStringArray(R.array.linea_nessunaCitta_array);
+
+
+
+        lineaSpinnerAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_item, lineaBusArray);
+        lineaSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        lineaSpinner.setAdapter(lineaSpinnerAdapter);
+        lineaSpinner.setOnItemSelectedListener(new LineaSpinnerListener());
+
         traceLineaButton = (Button)view.findViewById(R.id.traceLineaBtn);
         traceLineaButton.setOnClickListener(this);
 
         return view;
-    }
-
-    @Override
-    public void onClick(View v){
-        int buttonId = v.getId();
-
-        switch(buttonId){
-            case R.id.traceLineaBtn:
-                String[] argumentsToPass ={"catania", "207"};
-                mListener.onFragmentInteraction("traceLinea", argumentsToPass);
-                break;
-        }
     }
 
     @Override
@@ -105,6 +126,47 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
         mListener = null;
     }
 
+    @Override
+    public void onClick(View v){
+        int buttonId = v.getId();
+
+        switch(buttonId){
+            case R.id.traceLineaBtn:
+                String[] argumentsToPass = {citySelected, lineaSelected};
+                mListener.onFragmentInteraction("traceLinea", argumentsToPass);
+                break;
+        }
+    }
+
+    private void changeCitySpinnerAdapter(String city){
+        /*Abbiamo una sola regione quindi non fa nulla*/
+    }
+
+    private void changeLineaSpinnerAdapter(){
+        String msg = "citta' selezionata: " + citySelected;
+        Log.d("changeLineaSpinner", msg);
+        switch(citySelected){
+            case "Catania":
+                Log.d("changeLineaSpinner", "CASE: catania");
+                lineaBusArray = getResources().getStringArray(R.array.linea_catania_array);
+
+                break;
+            case "Messina":
+                Log.d("changeLineaSpinner", "CASE: messina");
+                lineaBusArray = getResources().getStringArray(R.array.linea_messina_array);
+
+                break;
+            case "Palermo":
+                Log.d("changeLineaSpinner", "CASE: palermo");
+                lineaBusArray = getResources().getStringArray(R.array.linea_palermo_array);
+                break;
+        }
+
+        lineaSpinnerAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_item, lineaBusArray);
+        lineaSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        lineaSpinner.setAdapter(lineaSpinnerAdapter);
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -119,6 +181,46 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
 
         void onFragmentInteraction(String cmd, String[] arguments);
 
+    }
+
+
+    /*Classe che implementa il listener per lo spinner selezione citta'*/
+    protected class CitySpinnerListener implements Spinner.OnItemSelectedListener{
+
+        /*costruttore*/
+        public CitySpinnerListener(){
+
+        }
+
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            citySelected = citySpinnerAdapter.getItem(position).toString();
+            changeLineaSpinnerAdapter();
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
+    }
+
+    /*Classe che implementa il listener per lo spinner selezione linea*/
+    protected class LineaSpinnerListener implements Spinner.OnItemSelectedListener{
+
+        /*costruttore*/
+        public LineaSpinnerListener(){
+
+        }
+
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            lineaSelected = lineaSpinnerAdapter.getItem(position).toString();
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
     }
 
 }
