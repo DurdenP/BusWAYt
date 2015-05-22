@@ -1,10 +1,13 @@
 package app.durdenp.com.buswayt.client;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.ResultReceiver;
 import android.support.v7.app.ActionBarActivity;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationManager;
-import android.location.LocationListener;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -20,38 +23,51 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.ListIterator;
 
 import app.durdenp.com.buswayt.R;
+import app.durdenp.com.buswayt.service.BusDescriptor;
+import app.durdenp.com.buswayt.service.FermataDescriptor;
+import app.durdenp.com.buswayt.service.LineaDescriptor;
+import app.durdenp.com.buswayt.service.LineaMonitoringService;
 
 
 public class ClientActivity extends ActionBarActivity implements RequestLineaFragment.OnFragmentInteractionListener {
 
     private GoogleMap googleMap;
+    private LineaMonitoringService lineaServiceConnection;
+    private boolean mBound = false;
 
-    private ArrayList<LatLng> posMarkArray = new ArrayList<>();
-    private ArrayList<Marker> markerArray = new ArrayList<>();
+
+    //Description Bus Stop variable
+    private LineaDescriptor linea;
+    private ArrayList<Marker> busStopArray;
+    private String citySelected;
+
+    //Tracing bus description
+    BusPositionReceiver tracingReceiver;
+    ArrayList<Marker> busMarker;
 
 
-    private LocationManager locationManager;
-    private LocationListener listenerFine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client);
 
+        //Adding Second Fragment
         RequestLineaFragment lineaFragment = new RequestLineaFragment();
         lineaFragment.setArguments(getIntent().getExtras());
-
         getFragmentManager().beginTransaction().add(R.id.linearlayout02, lineaFragment).commit();
+        //End Adding second frame
 
-        posMarkArray.add(new LatLng(37.524940, 15.073690));
-        posMarkArray.add(new LatLng(37.526340, 15.075090));
+        //Tracing bus configuration
+        tracingReceiver = new BusPositionReceiver(null);
+
 
         try {
             // Loading map
             initilizeMap();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -59,21 +75,7 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         if (googleMap != null) {
 
             //Focalizziamo la mappa su un punto prefissato
-
-            if(!posMarkArray.isEmpty()) {
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(posMarkArray.get(0), 10));
-            }else{
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.524940, 15.073690), 15));
-            }
-
-
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.524940, 15.073690), 15));
-            //Aggiungiamo i marker
-
-            for(int i = 0; i < posMarkArray.size() ; i++){
-                markerArray.add(googleMap.addMarker(new MarkerOptions()
-                        .position(posMarkArray.get(i)).title("Marker_"+i)));
-            }
 
 
         } else {
@@ -82,6 +84,43 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
                     , this, 0).show();
         }
     }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        Intent intent = new Intent(this, LineaMonitoringService.class);
+        intent.putExtra("receiver", tracingReceiver);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
+    }
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            LineaMonitoringService.LocalBinder binder = (LineaMonitoringService.LocalBinder) service;
+            lineaServiceConnection = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -121,80 +160,10 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
 
     }
 
-    //Registrazione del location listener
-    private void registerLocationListener() {
-
-        //ottenimento location manager da sistema
-        locationManager = (LocationManager)
-                getSystemService(LOCATION_SERVICE);
-
-        //definizione criteri di scelta del provider
-        Criteria fine = new Criteria();
-        fine.setAccuracy(Criteria.ACCURACY_FINE);
-
-        if (listenerFine == null)
-            createLocationListener();
-
-        //registrazione del listener al location manager
-        locationManager.requestLocationUpdates(
-                locationManager.getBestProvider(fine, true),
-                1000, 1, listenerFine);
-
-        //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,0,listenerFine);
-    }
-
-    private void createLocationListener() {
-
-        //Creazione del location listener
-        listenerFine = new LocationListener() {
-            public void onStatusChanged(String provider,
-                                        int status, Bundle extras) {
-            }
-
-            public void onProviderEnabled(String provider) {
-            }
-
-            public void onProviderDisabled(String provider) {
-            }
-
-            //azione da eseguire ad ogni variazione della posizione
-            public void onLocationChanged(Location location) {
-
-                for(int i = 0; i<posMarkArray.size(); i++){
-                    double tmp = i*0.00003;
-                    posMarkArray.set(i, new LatLng(location.getLatitude()+tmp, location.getLongitude()+tmp));
-                }
-
-                if (googleMap != null) {
-
-                    //Focalizziamo la mappa su un punto prefissato
-                    if(!posMarkArray.isEmpty()) {
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(posMarkArray.get(0), 15));
-                    }else{
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.524940, 15.073690), 15));
-                    }
-
-                    //Rimuoviamo vecchio marker
-                    for(Marker tmp : markerArray){
-                        tmp.remove();
-                    }
-
-                    //Aggiungiamo il marker per la nuova posizione
-                    for(int i = 0; i < posMarkArray.size() ; i++){
-                        markerArray.add(googleMap.addMarker(new MarkerOptions()
-                                .position(posMarkArray.get(i)).title("Marker_"+i)));
-                    }
-
-                }
-            }
-        };
-
-    }
 
     @Override
     protected void onResume() {
         super.onResume();
-        registerLocationListener();
         initilizeMap();
 
     }
@@ -205,7 +174,7 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
 
         //Se l'applicazione lascia il foreground
         //cancello la sottoscrizione al location listener
-        locationManager.removeUpdates(listenerFine);
+        //locationManager.removeUpdates(listenerFine);
 
     }
 
@@ -217,7 +186,122 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
                 String message = "città: " + arguments[0] + " linea: " + arguments[1];
                 Toast toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
                 toast.show();
+                citySelected = arguments[0];
+                centerMapToCitySelected();
+                linea = lineaServiceConnection.getLineaDescriptor(arguments[1], arguments[0]);
+                printLinea();
                 break;
+        }
+    }
+
+
+    private void centerMapToCitySelected(){
+        LatLng position = new LatLng(37.524940, 15.073690);
+
+        switch(citySelected){
+            case "Catania":
+                position = new LatLng(37.524940, 15.073690);
+                break;
+            case "Palermo":
+                position = new LatLng(38.120113, 13.356774);
+                break;
+            case "Messina":
+                position = new LatLng(38.185347, 15.546908);
+                break;
+        }
+
+        if(googleMap != null){
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 14));
+        }
+    }
+
+    /**
+     * Disegna il percorso della linea selezionata sulla mappa
+     */
+    private void printLinea(){
+        ListIterator<FermataDescriptor> it = linea.getBusStops().listIterator();
+
+        double latitude = 0;
+        double longitude = 0;
+        double stopCount = 0;
+
+
+        /*Removing old bus stop*/
+        if(busStopArray == null){
+            busStopArray = new ArrayList();
+        }
+
+        if(!busStopArray.isEmpty()) {
+            for (Marker tmp : busStopArray) {
+                tmp.remove();
+            }
+        }
+
+        /*adding current busStop array*/
+        while(it.hasNext()){
+            stopCount++;
+            FermataDescriptor tmp = it.next();
+            latitude = latitude + tmp.getCoordinates().latitude;
+            longitude = longitude + tmp.getCoordinates().longitude;
+
+            busStopArray.add(googleMap.addMarker(new MarkerOptions().title(tmp.getNome()).position(tmp.getCoordinates())));
+        }
+
+        LatLng cameraposition = new LatLng(latitude/stopCount, longitude/stopCount);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cameraposition, 14));
+
+    }
+
+    /**
+     * TODO
+     * @param bus
+     */
+    private void printBusMarker(ArrayList<BusDescriptor> bus){
+        if(busMarker == null){
+            busMarker = new ArrayList();
+        }
+
+        if(!busMarker.isEmpty()){
+            for(Marker tmp : busMarker){
+                tmp.remove();
+            }
+        }
+
+        for(BusDescriptor tmpDesc : bus){
+            busMarker.add(googleMap.addMarker(new MarkerOptions().title(tmpDesc.getId()).position(tmpDesc.getCoordinates())));
+        }
+    }
+
+
+    class BusPositionReceiver extends ResultReceiver{
+
+        /**
+         * Create a new ResultReceive to receive results.  Your
+         * {@link #onReceiveResult} method will be called from the thread running
+         * <var>handler</var> if given, or from an arbitrary thread if null.
+         *
+         * @param handler
+         */
+        public BusPositionReceiver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+
+            if(resultCode == 1){
+                BusDescriptor bus = new BusDescriptor("CT130", "BRT");
+                LatLng coord = new LatLng(resultData.getDouble("latitude"), resultData.getDouble("longitude"));
+                bus.setCoordinates(coord);
+                bus.setSpeed(resultData.getDouble("speed"));
+                ArrayList<BusDescriptor> tmpArray = new ArrayList();
+                tmpArray.add(bus);
+
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coord, 16));
+
+                //Calling print function
+                printBusMarker(tmpArray);
+            }
 
         }
     }
