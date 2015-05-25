@@ -32,7 +32,7 @@ import app.durdenp.com.buswayt.service.LineaDescriptor;
 import app.durdenp.com.buswayt.service.LineaMonitoringService;
 
 
-public class ClientActivity extends ActionBarActivity implements RequestLineaFragment.OnFragmentInteractionListener {
+public class ClientActivity extends ActionBarActivity implements RequestLineaFragment.OnFragmentInteractionListener, BusListFragmentFragment.OnFragmentInteractionListener {
 
     private GoogleMap googleMap;
     private LineaMonitoringService lineaServiceConnection;
@@ -55,11 +55,20 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client);
 
+        /*
         //Adding Second Fragment
         RequestLineaFragment lineaFragment = new RequestLineaFragment();
         lineaFragment.setArguments(getIntent().getExtras());
         getFragmentManager().beginTransaction().add(R.id.linearlayout02, lineaFragment).commit();
         //End Adding second frame
+        */
+
+        //Adding Third Fragment
+        BusListFragmentFragment busListFragment = new BusListFragmentFragment();
+        busListFragment.setArguments(getIntent().getExtras());
+        getFragmentManager().beginTransaction().add(R.id.linearlayout02, busListFragment).commit();
+        //End Adding Third Fragment
+
 
         //Tracing bus configuration
         tracingReceiver = new BusPositionReceiver(null);
@@ -178,6 +187,11 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
 
     }
 
+    /**
+     * Refer to RequestLineaFragment
+     * @param cmd
+     * @param arguments
+     */
     @Override
     public void onFragmentInteraction(String cmd, String[] arguments) {
         Log.d("onFragmentInteraction", cmd);
@@ -194,6 +208,18 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         }
     }
 
+    /**
+     * Refer to BusListFragment
+     * @param id
+     */
+    @Override
+    public void onFragmentInteraction(String id) {
+        /*TODO busListFragment Interaction Listener*/
+        Toast.makeText(this, id + " Clicked!"
+                , Toast.LENGTH_SHORT).show();
+
+
+    }
 
     private void centerMapToCitySelected(){
         LatLng position = new LatLng(37.524940, 15.073690);
