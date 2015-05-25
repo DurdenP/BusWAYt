@@ -51,6 +51,7 @@
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:text="@string/btn_start_location_updates"
+        android:onClick="startLocationUpdates"
         android:textColor="@color/white" />
 
 </LinearLayout>

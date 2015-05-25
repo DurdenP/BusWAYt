@@ -6,8 +6,8 @@ import android.location.Location;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.widget.Button;
-import android.widget.TextView;
+import android.util.Log;
+
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -27,8 +27,9 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
     // Google client to interact with Google API
     private GoogleApiClient mGoogleApiClient;
 
-    // boolean flag to toggle periodic location updates
     private boolean mRequestingLocationUpdates = false;
+
+
 
     private LocationRequest mLocationRequest;
 
@@ -37,9 +38,6 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
     private static int FATEST_INTERVAL = 5000; // 5 sec
     private static int DISPLACEMENT = 10; // 10 meters
 
-    // UI elements
-    private TextView lblLocation;
-    private Button btnShowLocation, btnStartLocationUpdates;
 
     private final IBinder mBinder = new LocalBinder();
 
@@ -52,31 +50,44 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
 
     @Override
     public void onCreate(){
-        Toast.makeText(getApplicationContext(),
-                "Il service e' stato creato", Toast.LENGTH_LONG).show();
 
 
         // First we need to check availability of play services
         if (checkPlayServices()) {
 
+            System.out.println("Dentro checkPlayServices");
             // Building the GoogleApi client
             buildGoogleApiClient();
 
             createLocationRequest();
         }
 
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.connect();
+        }
+        Toast.makeText(getApplicationContext(),
+                "Il Localization service e' partito", Toast.LENGTH_LONG).show();
+
     }
+
+
+
 
     @Override
     public void onStart(Intent intent, int id){
-        Toast.makeText(getApplicationContext(),
-                "Il service e' partito", Toast.LENGTH_LONG).show();
+
+
+
     }
+
+
 
     @Override
     public void onDestroy(){
         Toast.makeText(getApplicationContext(),
                 "Il service e' stato terminato", Toast.LENGTH_LONG).show();
+
+
     }
 
     @Override
@@ -92,21 +103,68 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
 
     @Override
     public void onConnected(Bundle bundle) {
+        // Once connected with google api, get the location
+        displayLocation();
+
+        if (mRequestingLocationUpdates) {
+            startLocationUpdates();
+        }
 
     }
 
     @Override
     public void onConnectionSuspended(int i) {
+        mGoogleApiClient.connect();
 
     }
 
     @Override
     public void onLocationChanged(Location location) {
+        // Assign the new location
+        mLastLocation = location;
+
+        Toast.makeText(getApplicationContext(), "Location changed!",
+                Toast.LENGTH_SHORT).show();
+
+        // Displaying the new location on UI
+        displayLocation();
 
     }
 
+    /**
+     * Method to display the location on UI
+     * */
+    private void displayLocation() {
+
+        mLastLocation = LocationServices.FusedLocationApi
+                .getLastLocation(mGoogleApiClient);
+
+        if (mLastLocation != null) {
+            double latitude = mLastLocation.getLatitude();
+            double longitude = mLastLocation.getLongitude();
+
+
+            Toast.makeText(getApplicationContext(),
+                    "Latitude:"+ latitude +", "+ "Longitude: "+ longitude, Toast.LENGTH_LONG)
+                    .show();
+
+
+        } else {
+
+
+            Toast.makeText(getApplicationContext(),
+                    "(Couldn't get the location. Make sure location is enabled on the device)", Toast.LENGTH_LONG)
+                    .show();
+        }
+    }
+
+
+
+
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+    public void onConnectionFailed(ConnectionResult result) {
+        Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = "
+                + result.getErrorCode());
 
     }
 
@@ -150,6 +208,8 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API).build();
+        System.out.println("buildGoogleApiClient");
+
     }
 
 
@@ -162,6 +222,7 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
         mLocationRequest.setFastestInterval(FATEST_INTERVAL);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setSmallestDisplacement(DISPLACEMENT);
+        System.out.println("createLocationRequest");
     }
 
 
@@ -174,6 +235,38 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
 
 
 
+    /**
+     * Starting the location updates
+     * */
+    public void startLocationUpdates() {
+        Log.d(TAG, "Periodic location updates started!");
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
+        mRequestingLocationUpdates = true;
+
+    }
+
+    /**
+     * Stopping location updates
+     */
+    public void stopLocationUpdates() {
+        mRequestingLocationUpdates = false;
+        Log.d(TAG, "Periodic location updates stopped!");
+
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mGoogleApiClient, this);
+    }
 
 
-}
+    }
+
+
+
+
+
+
+
+
+
+
+
