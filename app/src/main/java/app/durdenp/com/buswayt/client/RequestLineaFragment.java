@@ -2,7 +2,6 @@ package app.durdenp.com.buswayt.client;
 
 import android.app.Activity;
 import android.os.Bundle;
-//import android.app.Fragment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,15 +11,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.Toast;
 
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import com.android.volley.*;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
 import app.durdenp.com.buswayt.R;
 
@@ -135,6 +130,7 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
         switch(buttonId){
             case R.id.traceLineaBtn:
                 String[] argumentsToPass = {citySelected, lineaSelected};
+                sendGet();
                 mListener.onFragmentInteraction("traceLinea", argumentsToPass);
                 break;
         }
@@ -151,13 +147,6 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
             case "Catania":
                 Log.d("changeLineaSpinner", "CASE: catania");
                 lineaBusArray = getResources().getStringArray(R.array.linea_catania_array);
-                try {
-                    sendGet();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-
                 break;
             case "Messina":
                 Log.d("changeLineaSpinner", "CASE: messina");
@@ -176,32 +165,31 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
     }
 
     /*MARCO*/
-    private void sendGet() throws Exception {
+    private void sendGet() {
 
+        RequestQueue queue = Volley.newRequestQueue(getActivity());
         String url = "http://www.amt.ct.it/MappaLinee/leggifermate.php?linee=BRT1%3B";
 
-        HttpClient client = new DefaultHttpClient();
-        HttpGet request = new HttpGet(url);
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the first 500 characters of the response string.
+                        Toast.makeText(getActivity(),
+                                "Response is:" + response.substring(0,500), Toast.LENGTH_SHORT)
+                                .show();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getActivity(),
+                        "That didn't work!", Toast.LENGTH_SHORT)
+                        .show();
+            }
+        });
 
-        // add request header
-        request.addHeader("User-Agent", "Mozilla/5.0");
-
-        HttpResponse response = client.execute(request);
-
-        System.out.println("\nSending 'GET' request to URL : " + url);
-        System.out.println("Response Code : "
-                + response.getStatusLine().getStatusCode());
-
-        BufferedReader rd = new BufferedReader(
-                new InputStreamReader(response.getEntity().getContent()));
-
-        StringBuffer result = new StringBuffer();
-        String line = "";
-        while ((line = rd.readLine()) != null) {
-            result.append(line);
-        }
-
-        System.out.println(result.toString());
+        queue.add(stringRequest);
 
     }
 
