@@ -2,7 +2,8 @@ package app.durdenp.com.buswayt.client;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.app.Fragment;
+//import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,14 +31,12 @@ public class BusListFragmentFragment extends Fragment implements AbsListView.OnI
 
     private List<BusListItem> busListItem;
 
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM1 = "page";
+    private static final String ARG_PARAM2 = "title";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private int mPage;
+    private String mTitle;
 
     private OnFragmentInteractionListener mListener;
 
@@ -53,11 +52,11 @@ public class BusListFragmentFragment extends Fragment implements AbsListView.OnI
     private ListAdapter mAdapter;
 
     // TODO: Rename and change types of parameters
-    public static BusListFragmentFragment newInstance(String param1, String param2) {
+    public static BusListFragmentFragment newInstance(int page, String title) {
         BusListFragmentFragment fragment = new BusListFragmentFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putInt(ARG_PARAM1, page);
+        args.putString(ARG_PARAM2, title);
         fragment.setArguments(args);
         return fragment;
     }
@@ -74,8 +73,8 @@ public class BusListFragmentFragment extends Fragment implements AbsListView.OnI
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mPage = getArguments().getInt(ARG_PARAM1);
+            mTitle = getArguments().getString(ARG_PARAM2);
         }
 
         busListItem = new ArrayList();

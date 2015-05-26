@@ -7,6 +7,10 @@ import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.ResultReceiver;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -49,26 +53,50 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
     ArrayList<Marker> busMarker;
 
 
+    //Page Adapter
+    ClientActivityPagerAdapter adapterViewPager;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client);
 
-        /*
-        //Adding Second Fragment
-        RequestLineaFragment lineaFragment = new RequestLineaFragment();
-        lineaFragment.setArguments(getIntent().getExtras());
-        getFragmentManager().beginTransaction().add(R.id.linearlayout02, lineaFragment).commit();
-        //End Adding second frame
-        */
+        ViewPager vpPager = (ViewPager) findViewById(R.id.vpPager);
+        adapterViewPager = new ClientActivityPagerAdapter(getSupportFragmentManager());
+        vpPager.setAdapter(adapterViewPager);
 
-        //Adding Third Fragment
-        BusListFragmentFragment busListFragment = new BusListFragmentFragment();
-        busListFragment.setArguments(getIntent().getExtras());
-        getFragmentManager().beginTransaction().add(R.id.linearlayout02, busListFragment).commit();
-        //End Adding Third Fragment
+        vpPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
+            // This method will be invoked when a new page becomes selected.
+            @Override
+            public void onPageSelected(int position) {
+                switch(position){
+                    case 0:
+                        RequestLineaFragment reqLFragment = (RequestLineaFragment) adapterViewPager.getItem(position);
+                        reqLFragment.setArguments(getIntent().getExtras());
+                        break;
+                    case 1:
+                        BusListFragmentFragment busLFragment = (BusListFragmentFragment) adapterViewPager.getItem(position);
+                        busLFragment.setArguments(getIntent().getExtras());
+                        break;
+                }
+            }
+
+            // This method will be invoked when the current page is scrolled
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                // Code goes here
+            }
+
+            // Called when the scroll state changes:
+            // SCROLL_STATE_IDLE, SCROLL_STATE_DRAGGING, SCROLL_STATE_SETTLING
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                // Code goes here
+            }
+        });
 
         //Tracing bus configuration
         tracingReceiver = new BusPositionReceiver(null);
@@ -165,7 +193,6 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
                         .show();
             }
         }
-
 
     }
 
@@ -330,5 +357,39 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
             }
 
         }
+    }
+
+    public static class ClientActivityPagerAdapter extends FragmentPagerAdapter {
+        private static int NUM_ITEMS = 2;
+
+        public ClientActivityPagerAdapter(FragmentManager fragmentManager) {
+            super(fragmentManager);
+        }
+
+        // Returns total number of pages
+        @Override
+        public int getCount() {
+            return NUM_ITEMS;
+        }
+
+        // Returns the fragment to display for that page
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 0: // Fragment # 0 - This will show FirstFragment
+                    return RequestLineaFragment.newInstance(0, " Seleziona Linea");
+                case 1: // Fragment # 0 - This will show FirstFragment different title
+                    return BusListFragmentFragment.newInstance(1, "Elenco Autobus");
+                default:
+                    return null;
+            }
+        }
+
+        // Returns the page title for the top indicator
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return "Page " + position;
+        }
+
     }
 }
