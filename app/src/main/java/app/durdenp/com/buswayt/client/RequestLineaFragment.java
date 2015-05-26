@@ -1,9 +1,9 @@
 package app.durdenp.com.buswayt.client;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
+//import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +13,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 
-import java.util.ArrayList;
-import java.util.List;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 import app.durdenp.com.buswayt.R;
 
@@ -27,14 +33,12 @@ import app.durdenp.com.buswayt.R;
  * create an instance of this fragment.
  */
 public class RequestLineaFragment extends Fragment implements Button.OnClickListener {
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM1 = "page";
+    private static final String ARG_PARAM2 = "title";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private int mPage;
+    private String mTitle;
 
     private Button traceLineaButton;
     private Spinner citySpinner;
@@ -50,19 +54,16 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
     private OnFragmentInteractionListener mListener;
 
     /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment RequestLineaFragment.
+     * @param page
+     * @param title
+     * @return
      */
-    // TODO: Rename and change types and number of parameters
-    public static RequestLineaFragment newInstance(String param1, String param2) {
+    public static RequestLineaFragment newInstance(int page, String title) {
         RequestLineaFragment fragment = new RequestLineaFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putInt(ARG_PARAM1, page);
+        args.putString(ARG_PARAM2, title);
         fragment.setArguments(args);
         return fragment;
     }
@@ -75,8 +76,8 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mPage = getArguments().getInt(ARG_PARAM1);
+            mTitle = getArguments().getString(ARG_PARAM2);
         }
     }
 
@@ -113,6 +114,7 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
+            Log.d("RequestLineaFragment", "OnAttachMethod");
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
@@ -149,6 +151,12 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
             case "Catania":
                 Log.d("changeLineaSpinner", "CASE: catania");
                 lineaBusArray = getResources().getStringArray(R.array.linea_catania_array);
+                try {
+                    sendGet();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
 
                 break;
             case "Messina":
@@ -166,6 +174,37 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
         lineaSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         lineaSpinner.setAdapter(lineaSpinnerAdapter);
     }
+
+    /*MARCO*/
+    private void sendGet() throws Exception {
+
+        String url = "http://www.amt.ct.it/MappaLinee/leggifermate.php?linee=BRT1%3B";
+
+        HttpClient client = new DefaultHttpClient();
+        HttpGet request = new HttpGet(url);
+
+        // add request header
+        request.addHeader("User-Agent", "Mozilla/5.0");
+
+        HttpResponse response = client.execute(request);
+
+        System.out.println("\nSending 'GET' request to URL : " + url);
+        System.out.println("Response Code : "
+                + response.getStatusLine().getStatusCode());
+
+        BufferedReader rd = new BufferedReader(
+                new InputStreamReader(response.getEntity().getContent()));
+
+        StringBuffer result = new StringBuffer();
+        String line = "";
+        while ((line = rd.readLine()) != null) {
+            result.append(line);
+        }
+
+        System.out.println(result.toString());
+
+    }
+
 
     /**
      * This interface must be implemented by activities that contain this
