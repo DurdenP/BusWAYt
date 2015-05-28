@@ -9,12 +9,15 @@ import android.os.IBinder;
 import android.os.ResultReceiver;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 
-import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -83,35 +86,55 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
 
 
     public LineaDescriptor getLineaDescriptor(String label, String city){
-        LineaDescriptor linea = new LineaDescriptor();
+        //TODO substitute city with id of linea;
 
-        /*TODO rimuovere il codice segunete e inserire il codice per fare la richiesta al webservice
-        * la linea potrebbe anche essere salvata in locale, ad esempio nella citta' dove si risiede
-        * e si usa spesso il servizio in modo da non dover fare sempre richieste che consumano banda
-        * e batteria*/
-        LinkedList<FermataDescriptor> busStops = new LinkedList();
+        LineaDescriptor tmp = new LineaDescriptor(label, city);
+        sendFermate(label);
 
-        FermataDescriptor stop01 = new FermataDescriptor("Parcheggio 2 Obelischi", "1832", new LatLng(37.541386, 15.078818));
-        FermataDescriptor stop02 = new FermataDescriptor("Largo Barriera", "1833", new LatLng(37.542831, 15.076597));
-        FermataDescriptor stop03 = new FermataDescriptor("Passo gravina", "171", new LatLng(37.538871, 15.071018));
-        FermataDescriptor stop04 = new FermataDescriptor("Passo gravina 261", "1835", new LatLng(37.533429, 15.076938));
-        FermataDescriptor stop05 = new FermataDescriptor("Via Etnea f/co", "177", new LatLng(37.524651, 15.081988));
-        FermataDescriptor stop06 = new FermataDescriptor("Largo Barriera", "1844", new LatLng(37.542775, 15.076511));
-
-        busStops.add(stop01);
-        busStops.add(stop02);
-        busStops.add(stop03);
-        busStops.add(stop04);
-        busStops.add(stop05);
-        busStops.add(stop06);
-
-        linea.setId("ctBrt");
-        linea.setLabel(label);
-        linea.setBusStops(busStops);
-        tracingRequestor();
-
-        return linea;
+        return tmp;
     }
+
+    private String getStringResourceByName(String aString) {
+        String packageName = getPackageName();
+        int resId = getResources().getIdentifier(aString, "string", packageName);
+        return getString(resId);
+    }
+
+    /**
+     * Send fermate of linea to activity
+     * @param linea
+     */
+    private void sendFermate(String linea) {
+        String mLinea = "l"+linea;
+
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        String url = getStringResourceByName(mLinea);
+
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Receive the responce and send it to activity because through bundle
+                        // we can only pass flat data
+                        Bundle bundle = new Bundle();
+                        bundle.putString("response", response);
+                        busTraceReceiver.send(2, bundle);
+                        //TODO insert trace request
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(),
+                        "That didn't work!", Toast.LENGTH_SHORT)
+                        .show();
+            }
+        });
+        queue.add(stringRequest);
+    }
+
+
+
 
     /**
      * Questa funzione chiede al webservice la posizione di uno o di tutti gli autobus

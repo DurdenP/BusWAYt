@@ -130,7 +130,6 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
         switch(buttonId){
             case R.id.traceLineaBtn:
                 String[] argumentsToPass = {citySelected, lineaSelected};
-                sendGet();
                 mListener.onFragmentInteraction("traceLinea", argumentsToPass);
                 break;
         }
@@ -141,20 +140,20 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
     }
 
     private void changeLineaSpinnerAdapter(){
-        String msg = "citta' selezionata: " + citySelected;
-        Log.d("changeLineaSpinner", msg);
+        //String msg = "citta' selezionata: " + citySelected;
+        //Log.d("changeLineaSpinner", msg);
         switch(citySelected){
             case "Catania":
-                Log.d("changeLineaSpinner", "CASE: catania");
+                //Log.d("changeLineaSpinner", "CASE: catania");
                 lineaBusArray = getResources().getStringArray(R.array.linea_catania_array);
                 break;
             case "Messina":
-                Log.d("changeLineaSpinner", "CASE: messina");
+                //Log.d("changeLineaSpinner", "CASE: messina");
                 lineaBusArray = getResources().getStringArray(R.array.linea_messina_array);
 
                 break;
             case "Palermo":
-                Log.d("changeLineaSpinner", "CASE: palermo");
+                //Log.d("changeLineaSpinner", "CASE: palermo");
                 lineaBusArray = getResources().getStringArray(R.array.linea_palermo_array);
                 break;
         }
@@ -162,35 +161,6 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
         lineaSpinnerAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_item, lineaBusArray);
         lineaSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         lineaSpinner.setAdapter(lineaSpinnerAdapter);
-    }
-
-    /*MARCO*/
-    private void sendGet() {
-
-        RequestQueue queue = Volley.newRequestQueue(getActivity());
-        String url = "http://www.amt.ct.it/MappaLinee/leggifermate.php?linee=BRT1%3B";
-
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Display the first 500 characters of the response string.
-                        Toast.makeText(getActivity(),
-                                "Response is:" + response.substring(0,500), Toast.LENGTH_SHORT)
-                                .show();
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getActivity(),
-                        "That didn't work!", Toast.LENGTH_SHORT)
-                        .show();
-            }
-        });
-
-        queue.add(stringRequest);
-
     }
 
 

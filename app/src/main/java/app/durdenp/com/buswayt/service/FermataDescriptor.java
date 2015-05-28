@@ -7,8 +7,8 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public class FermataDescriptor {
 
-    private String nome;
     private String id;
+    private String nome;
     private LatLng coordinates;
 
     /*Constructor*/

@@ -25,13 +25,18 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.ListIterator;
 
 import app.durdenp.com.buswayt.R;
 import app.durdenp.com.buswayt.service.BusDescriptor;
 import app.durdenp.com.buswayt.service.FermataDescriptor;
+import app.durdenp.com.buswayt.service.FermateWrapper;
 import app.durdenp.com.buswayt.service.LineaDescriptor;
 import app.durdenp.com.buswayt.service.LineaMonitoringService;
 
@@ -72,7 +77,7 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
             // This method will be invoked when a new page becomes selected.
             @Override
             public void onPageSelected(int position) {
-                switch(position){
+                switch (position) {
                     case 0:
                         RequestLineaFragment reqLFragment = (RequestLineaFragment) adapterViewPager.getItem(position);
                         reqLFragment.setArguments(getIntent().getExtras());
@@ -225,12 +230,9 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         switch(cmd){
             case "traceLinea":
                 String message = "città: " + arguments[0] + " linea: " + arguments[1];
-                Toast toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
-                toast.show();
                 citySelected = arguments[0];
                 centerMapToCitySelected();
                 linea = lineaServiceConnection.getLineaDescriptor(arguments[1], arguments[0]);
-                printLinea();
                 break;
         }
     }
@@ -342,20 +344,45 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
 
-            if(resultCode == 1){
-                BusDescriptor bus = new BusDescriptor("CT130", "BRT");
-                LatLng coord = new LatLng(resultData.getDouble("latitude"), resultData.getDouble("longitude"));
-                bus.setCoordinates(coord);
-                bus.setSpeed(resultData.getDouble("speed"));
-                ArrayList<BusDescriptor> tmpArray = new ArrayList();
-                tmpArray.add(bus);
+            switch(resultCode){
+                case 1:
+                    BusDescriptor bus = new BusDescriptor("CT130", "BRT");
+                    LatLng coord = new LatLng(resultData.getDouble("latitude"), resultData.getDouble("longitude"));
+                    bus.setCoordinates(coord);
+                    bus.setSpeed(resultData.getDouble("speed"));
+                    ArrayList<BusDescriptor> tmpArray = new ArrayList();
+                    tmpArray.add(bus);
 
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coord, 16));
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coord, 16));
 
-                //Calling print function
-                printBusMarker(tmpArray);
+                    //Calling print function
+                    printBusMarker(tmpArray);
+                    break;
+                case 2:
+                    LinkedList<FermataDescriptor> busStop = parseFermate(resultData.getString("response"));
+                    linea.setBusStops(busStop);
+                    printLinea();
+                    break;
+            }
+        }
+
+        private LinkedList<FermataDescriptor> parseFermate(String inputJSON){
+
+            Type listType = new TypeToken<LinkedList<FermateWrapper>>() {}.getType();
+            Gson reader = new Gson();
+
+            LinkedList<FermateWrapper> fermate = reader.fromJson(inputJSON, listType);
+
+            LinkedList<FermataDescriptor> tmpFermate = new LinkedList();
+
+            ListIterator<FermateWrapper> it = fermate.listIterator();
+            while(it.hasNext()){
+                FermateWrapper tmpVect = it.next();
+                FermataDescriptor tmp = new FermataDescriptor(tmpVect.getDescrizione(), tmpVect.getCodice(), new LatLng(tmpVect.getLatitude(), tmpVect.getLongitude()));
+                tmpFermate.add(tmp);
             }
 
+            return tmpFermate;
         }
     }
 

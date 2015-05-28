@@ -5,11 +5,54 @@
     </string-array>
 
     <string-array name="linea_catania_array">
-        <item>201</item>
-        <item>259</item>
-        <item>BRT-1</item>
-        <item>2-5</item>
-        <item>258</item>
+        <item>brt</item>
+        <item> 101</item>
+        <item> 144</item>
+        <item> 237</item>
+        <item> 241</item>
+        <item> 244</item>
+        <item> 429</item>
+        <item> 431N</item>
+        <item> 431R</item>
+        <item> 432</item>
+        <item> 439</item>
+        <item> 443</item>
+        <item> 448</item>
+        <item> 449</item>
+        <item> 503</item>
+        <item> 522</item>
+        <item> 523</item>
+        <item> 524</item>
+        <item> 534</item>
+        <item> 536</item>
+        <item> 538</item>
+        <item> 550</item>
+        <item> 555</item>
+        <item> 556</item>
+        <item> 602</item>
+        <item> 621</item>
+        <item> 628N</item>
+        <item> 628R</item>
+        <item> 635</item>
+        <item> 642</item>
+        <item> 701</item>
+        <item> 702</item>
+        <item> 722</item>
+        <item> 726</item>
+        <item> 733</item>
+        <item> 740</item>
+        <item> 801</item>
+        <item> 802</item>
+        <item> 830</item>
+        <item> 902</item>
+        <item> 925</item>
+        <item> 927</item>
+        <item> 932</item>
+        <item> 935</item>
+        <item> D</item>
+        <item> S2</item>
+        <item> ALIBUS</item>
+
     </string-array>
 
     <string-array name="linea_palermo_array">
