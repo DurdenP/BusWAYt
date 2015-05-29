@@ -27,7 +27,7 @@ import app.durdenp.com.buswayt.R;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class BusListFragmentFragment extends Fragment implements AbsListView.OnItemClickListener {
+public class BusListFragment extends Fragment implements AbsListView.OnItemClickListener {
 
     private List<BusListItem> busListItem;
 
@@ -52,8 +52,8 @@ public class BusListFragmentFragment extends Fragment implements AbsListView.OnI
     private ListAdapter mAdapter;
 
     // TODO: Rename and change types of parameters
-    public static BusListFragmentFragment newInstance(int page, String title) {
-        BusListFragmentFragment fragment = new BusListFragmentFragment();
+    public static BusListFragment newInstance(int page, String title) {
+        BusListFragment fragment = new BusListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_PARAM1, page);
         args.putString(ARG_PARAM2, title);
@@ -65,7 +65,7 @@ public class BusListFragmentFragment extends Fragment implements AbsListView.OnI
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public BusListFragmentFragment() {
+    public BusListFragment() {
     }
 
     @Override

@@ -47,7 +47,7 @@ import app.durdenp.com.buswayt.mapUtility.LineaSetup;
 import app.durdenp.com.buswayt.service.LineaMonitoringService;
 
 
-public class ClientActivity extends ActionBarActivity implements RequestLineaFragment.OnFragmentInteractionListener, BusListFragmentFragment.OnFragmentInteractionListener {
+public class ClientActivity extends ActionBarActivity implements RequestLineaFragment.OnFragmentInteractionListener, BusListFragment.OnFragmentInteractionListener {
 
     private GoogleMap googleMap;
     private LineaMonitoringService lineaServiceConnection;
@@ -69,6 +69,7 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
 
     //Page Adapter
     ClientActivityPagerAdapter adapterViewPager;
+    BusListFragment busListFragment;
 
 
 
@@ -95,8 +96,8 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
                         reqLFragment.setArguments(getIntent().getExtras());
                         break;
                     case 1:
-                        BusListFragmentFragment busLFragment = (BusListFragmentFragment) adapterViewPager.getItem(position);
-                        busLFragment.setArguments(getIntent().getExtras());
+                        busListFragment = (BusListFragment) adapterViewPager.getItem(position);
+                        busListFragment.setArguments(getIntent().getExtras());
                         break;
                 }
             }
@@ -349,7 +350,7 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
             LatLng src= route.get(z);
             LatLng dest= route.get(z + 1);
             routeLineArray.add(googleMap.addPolyline(new PolylineOptions()
-                    .add(new LatLng(src.latitude, src.longitude), new LatLng(dest.latitude,   dest.longitude))
+                    .add(new LatLng(src.latitude, src.longitude), new LatLng(dest.latitude, dest.longitude))
                     .width(3)
                     .color(Color.BLUE).geodesic(true)));
         }
@@ -416,6 +417,11 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
                     manageLineaInfoResponce(resultData.getString("response"));
                     break;
             }
+        }
+
+        private void manageBusPositionInfoResponce(String busPositionJSON){
+            LinkedList<BusDescriptor> busList = lineaSetup.parseBusPositionJSON(busPositionJSON);
+
         }
 
         private void manageBusStopInfoResponce(String busStopJSON){
@@ -493,7 +499,7 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
                 case 0: // Fragment # 0 - This will show FirstFragment
                     return RequestLineaFragment.newInstance(0, " Seleziona Linea");
                 case 1: // Fragment # 0 - This will show FirstFragment different title
-                    return BusListFragmentFragment.newInstance(1, "Elenco Autobus");
+                    return BusListFragment.newInstance(1, "Elenco Autobus");
                 default:
                     return null;
             }
@@ -502,7 +508,14 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         // Returns the page title for the top indicator
         @Override
         public CharSequence getPageTitle(int position) {
-            return "Page " + position;
+            switch(position){
+                case 0:
+                    return "Seleziona Linea";
+                case 1:
+                    return "Elenco autobus";
+                default:
+                    return "Page " + position;
+            }
         }
 
     }

@@ -32,8 +32,8 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
     //Linea and bus tracked
     private ResultReceiver busTraceReceiver;
     private String city;
-    private String linea;
-    private String busID;
+    private String idLinea;
+    //private String busID;
 
     private Timer timer;
     private TimerTask busTracerTask;
@@ -87,13 +87,17 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
     }
 
 
-    public LineaDescriptor getLineaDescriptor(String label, String city){
-        //TODO substitute city with id of linea;
 
-        LineaDescriptor tmp = new LineaDescriptor(label, city);
-        sendFermate(label);
+    // TODO Actually city is not used because, we have only city in database
+    public LineaDescriptor getLineaDescriptor(String lineaId, String city){
 
-        sendLineaInfo(label);
+        LineaDescriptor tmp = new LineaDescriptor(lineaId, city);
+
+        this.idLinea = lineaId;
+        this.city = city;
+
+        sendBusStopRequest();
+        sendLineaInfoRequest();
 
         return tmp;
     }
@@ -105,11 +109,10 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
     }
 
     /**
-     * Send fermate of linea to activity
-     * @param linea
+     * Send fermate of selected linea to activity   CODE: 2
      */
-    private void sendFermate(String linea) {
-        String mLinea = "l"+linea;
+    private void sendBusStopRequest() {
+        String mLinea = "l"+idLinea;
 
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String url = getStringResourceByName(mLinea);
@@ -137,11 +140,13 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
         queue.add(stringRequest);
     }
 
-    //TODO remove this method, debug method
-    private void sendLineaInfo(String linea) {
+    /**
+     * Send info abaut route of selected linea to activity CODE: 4
+     */
+    private void sendLineaInfoRequest() {
 
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        String url = "http://www.amt.ct.it/MappaLinee/leggilineerichiestej.php?linee='"+linea+"','xx'";
+        String url = "http://www.amt.ct.it/MappaLinee/leggilineerichiestej.php?linee='"+idLinea+"','xx'";
 
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -168,10 +173,10 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
 
 
     /**
-     * Questa funzione chiede al webservice la posizione di uno o di tutti gli autobus
-     * della linea
+     * Questa funzione chiede al webservice la posizione di tutti gli autobus
+     * della linea e invia la risposta all'activity CODE: 1
      */
-    private void tracingRequestor(){
+    private void tracingRequest(){
 
         if(timer != null){
             timer.cancel();

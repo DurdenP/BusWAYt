@@ -301,4 +301,16 @@ public class LineaSetup {
         }
         return false;
     }
+
+    /**
+     *
+     * @param busPositionJSON
+     * @return
+     */
+    public LinkedList<BusDescriptor> parseBusPositionJSON(String busPositionJSON){
+        LinkedList<BusDescriptor> busList = new LinkedList();
+        
+        return busList;
+    }
+
 }

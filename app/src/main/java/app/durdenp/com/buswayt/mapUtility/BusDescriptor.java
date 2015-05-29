@@ -10,6 +10,8 @@ public class BusDescriptor {
     private String linea;
     private LatLng coordinates;
     private double speed;
+    private FermataDescriptor lastBusStop;
+    private FermataDescriptor nextBusStop;
 
     /**
      * Default Constructor
@@ -19,6 +21,8 @@ public class BusDescriptor {
         this.linea = null;
         this.speed = 0;
         this.coordinates = new LatLng(0.0, 0.0);
+        this.lastBusStop = null;
+        this.nextBusStop = null;
     }
 
     /**
@@ -27,7 +31,6 @@ public class BusDescriptor {
      */
     public BusDescriptor(String id){
         this.id = id;
-        this.linea = linea;
         this.coordinates = new LatLng(0.0, 0.0);
         this.speed = 0;
     }
@@ -42,6 +45,8 @@ public class BusDescriptor {
         this.linea = linea;
         this.coordinates = new LatLng(0.0, 0.0);
         this.speed = 0;
+        this.lastBusStop = null;
+        this.nextBusStop = null;
     }
 
     /**
@@ -54,6 +59,8 @@ public class BusDescriptor {
         this(id, linea);
         this.coordinates = coordinates;
         this.speed = 0;
+        this.lastBusStop = null;
+        this.nextBusStop = null;
     }
 
     /**
@@ -66,6 +73,36 @@ public class BusDescriptor {
     public BusDescriptor(String id, String linea, LatLng coordinates, double speed){
         this(id, linea, coordinates);
         this.speed = speed;
+        this.lastBusStop = null;
+        this.nextBusStop = null;
+    }
+
+    /**
+     *
+     * @param id
+     * @param linea
+     * @param coordinates
+     * @param speed
+     * @param lastBusStop
+     */
+    public BusDescriptor(String id, String linea, LatLng coordinates, double speed, FermataDescriptor lastBusStop){
+        this(id, linea, coordinates, speed);
+        this.lastBusStop = lastBusStop;
+        this.nextBusStop = null;
+    }
+
+    /**
+     *
+     * @param id
+     * @param linea
+     * @param coordinates
+     * @param speed
+     * @param lastBusStop
+     * @param nextBusStop
+     */
+    public BusDescriptor(String id, String linea, LatLng coordinates, double speed, FermataDescriptor lastBusStop, FermataDescriptor nextBusStop){
+        this(id, linea, coordinates, speed, lastBusStop);
+        this.nextBusStop = nextBusStop;
     }
 
     /**
@@ -130,5 +167,51 @@ public class BusDescriptor {
      */
     public void setSpeed(double speed) {
         this.speed = speed;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public FermataDescriptor getLastBusStop() {
+        return lastBusStop;
+    }
+
+    /**
+     *
+     * @param lastBusStop
+     */
+    public void setLastBusStop(FermataDescriptor lastBusStop) {
+        this.lastBusStop = lastBusStop;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public FermataDescriptor getNextBusStop() {
+        return nextBusStop;
+    }
+
+    /**
+     *
+     * @param nextBusStop
+     */
+    public void setNextBusStop(FermataDescriptor nextBusStop) {
+        this.nextBusStop = nextBusStop;
+    }
+
+    /**
+     *
+     * @return expected arrival time to next busStop
+     */
+    public int getPrevArrivalTime(){
+        //TODO implement this function
+        return 0;
+    }
+
+    private double getDistanceFromNextBusStop(){
+        //TODO implment this method
+        return 0.0;
     }
 }
