@@ -1,4 +1,4 @@
-package app.durdenp.com.buswayt.service;
+package app.durdenp.com.buswayt.jsonWrapper;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

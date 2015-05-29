@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.ResultReceiver;
@@ -22,9 +23,12 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -34,10 +38,12 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 
 import app.durdenp.com.buswayt.R;
-import app.durdenp.com.buswayt.service.BusDescriptor;
-import app.durdenp.com.buswayt.service.FermataDescriptor;
-import app.durdenp.com.buswayt.service.FermateWrapper;
-import app.durdenp.com.buswayt.service.LineaDescriptor;
+import app.durdenp.com.buswayt.jsonWrapper.LineaRequestedWrapper;
+import app.durdenp.com.buswayt.mapUtility.BusDescriptor;
+import app.durdenp.com.buswayt.mapUtility.FermataDescriptor;
+import app.durdenp.com.buswayt.jsonWrapper.FermateWrapper;
+import app.durdenp.com.buswayt.mapUtility.LineaDescriptor;
+import app.durdenp.com.buswayt.mapUtility.LineaSetup;
 import app.durdenp.com.buswayt.service.LineaMonitoringService;
 
 
@@ -47,9 +53,12 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
     private LineaMonitoringService lineaServiceConnection;
     private boolean mBound = false;
 
+    private LineaSetup lineaSetup;
+
 
     //Description Bus Stop variable
     private LineaDescriptor linea;
+    private ArrayList<Polyline> routeLineArray;
     private ArrayList<Marker> busStopArray;
     private String citySelected;
 
@@ -68,9 +77,12 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client);
 
+        lineaSetup = new LineaSetup();
+
         ViewPager vpPager = (ViewPager) findViewById(R.id.vpPager);
         adapterViewPager = new ClientActivityPagerAdapter(getSupportFragmentManager());
         vpPager.setAdapter(adapterViewPager);
+
 
         vpPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
@@ -274,12 +286,19 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
      * Disegna il percorso della linea selezionata sulla mappa
      */
     private void printLinea(){
+        printBusStop();
+        printRoute();
+    }
+
+    /**
+     *
+     */
+    private void printBusStop(){
         ListIterator<FermataDescriptor> it = linea.getBusStops().listIterator();
 
         double latitude = 0;
         double longitude = 0;
         double stopCount = 0;
-
 
         /*Removing old bus stop*/
         if(busStopArray == null){
@@ -298,12 +317,42 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
             FermataDescriptor tmp = it.next();
             latitude = latitude + tmp.getCoordinates().latitude;
             longitude = longitude + tmp.getCoordinates().longitude;
-
-            busStopArray.add(googleMap.addMarker(new MarkerOptions().title(tmp.getNome()).position(tmp.getCoordinates())));
+            if(stopCount == 1){/*Capolinea*/
+                busStopArray.add(googleMap.addMarker(new MarkerOptions().title(tmp.getNome()).position(tmp.getCoordinates()).snippet("Linee in Transito: " + tmp.getLineeTransito()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))));
+            }else {
+                busStopArray.add(googleMap.addMarker(new MarkerOptions().title(tmp.getNome()).position(tmp.getCoordinates()).snippet("Linee in Transito: " + tmp.getLineeTransito()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))));
+            }
         }
 
         LatLng cameraposition = new LatLng(latitude/stopCount, longitude/stopCount);
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cameraposition, 14));
+    }
+
+    /**
+     *
+     */
+    private void printRoute(){
+        LinkedList<LatLng> route = linea.getRoute();
+
+        Log.w("printRoute:size - ", Integer.toString(route.size()));
+        if(routeLineArray == null){
+            routeLineArray = new ArrayList();
+        }
+
+        if(!routeLineArray.isEmpty()){
+            for(Polyline tmp : routeLineArray){
+                tmp.remove();
+            }
+        }
+
+        for(int z = 0; z<route.size()-1; z++){
+            LatLng src= route.get(z);
+            LatLng dest= route.get(z + 1);
+            routeLineArray.add(googleMap.addPolyline(new PolylineOptions()
+                    .add(new LatLng(src.latitude, src.longitude), new LatLng(dest.latitude,   dest.longitude))
+                    .width(3)
+                    .color(Color.BLUE).geodesic(true)));
+        }
 
     }
 
@@ -323,7 +372,7 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         }
 
         for(BusDescriptor tmpDesc : bus){
-            busMarker.add(googleMap.addMarker(new MarkerOptions().title(tmpDesc.getId()).position(tmpDesc.getCoordinates())));
+            busMarker.add(googleMap.addMarker(new MarkerOptions().title(tmpDesc.getId()).position(tmpDesc.getCoordinates()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))));
         }
     }
 
@@ -345,7 +394,7 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         protected void onReceiveResult(int resultCode, Bundle resultData) {
 
             switch(resultCode){
-                case 1:
+                case 1: /*Follow bus movement with camera*/
                     BusDescriptor bus = new BusDescriptor("CT130", "BRT");
                     LatLng coord = new LatLng(resultData.getDouble("latitude"), resultData.getDouble("longitude"));
                     bus.setCoordinates(coord);
@@ -358,14 +407,29 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
                     //Calling print function
                     printBusMarker(tmpArray);
                     break;
-                case 2:
-                    LinkedList<FermataDescriptor> busStop = parseFermate(resultData.getString("response"));
-                    linea.setBusStops(busStop);
-                    printLinea();
+                case 2: /*Processing a list of bus stops of selected line*/
+                    manageBusStopInfoResponce(resultData.getString("response"));
+                    break;
+                case 3:/*Do not follow bus movement with camera*/
+                    break;
+                case 4:/*Receiving info of the linea route*/
+                    manageLineaInfoResponce(resultData.getString("response"));
                     break;
             }
         }
 
+        private void manageBusStopInfoResponce(String busStopJSON){
+            if(lineaSetup.setUpBusStop(linea, parseFermate(busStopJSON))){
+                printLinea();
+            }
+        }
+
+
+        /**
+         *
+         * @param inputJSON
+         * @return
+         */
         private LinkedList<FermataDescriptor> parseFermate(String inputJSON){
 
             Type listType = new TypeToken<LinkedList<FermateWrapper>>() {}.getType();
@@ -378,14 +442,37 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
             ListIterator<FermateWrapper> it = fermate.listIterator();
             while(it.hasNext()){
                 FermateWrapper tmpVect = it.next();
-                FermataDescriptor tmp = new FermataDescriptor(tmpVect.getDescrizione(), tmpVect.getCodice(), new LatLng(tmpVect.getLatitude(), tmpVect.getLongitude()));
+                FermataDescriptor tmp = new FermataDescriptor(tmpVect.getDescrizione(), tmpVect.getCodice(), tmpVect.getLineeTransito(), new LatLng(tmpVect.getLatitude(), tmpVect.getLongitude()));
                 tmpFermate.add(tmp);
             }
 
             return tmpFermate;
         }
+
+        /**
+         *
+         * @param lineaInfoJSON
+         */
+        private void manageLineaInfoResponce(String lineaInfoJSON){
+            Type listType = new TypeToken<LinkedList<LineaRequestedWrapper>>() {}.getType();
+            Gson reader = new Gson();
+
+            LinkedList<LineaRequestedWrapper> fermateInfo = reader.fromJson(lineaInfoJSON, listType);
+            lineaSetup.parseLineaRequestedWrapper(linea, fermateInfo.getFirst());
+            lineaSetup.setUpRoute(linea);
+
+            if(linea.isReadyToBePrinted()){
+                printLinea();
+            }
+        }
     }
 
+
+    /**
+     * INNER CLASS to manage fragment pager
+     *
+     *
+     */
     public static class ClientActivityPagerAdapter extends FragmentPagerAdapter {
         private static int NUM_ITEMS = 2;
 

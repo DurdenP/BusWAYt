@@ -21,6 +21,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import app.durdenp.com.buswayt.mapUtility.LineaDescriptor;
+
 public class LineaMonitoringService extends Service implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
@@ -91,6 +93,8 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
         LineaDescriptor tmp = new LineaDescriptor(label, city);
         sendFermate(label);
 
+        sendLineaInfo(label);
+
         return tmp;
     }
 
@@ -133,7 +137,34 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
         queue.add(stringRequest);
     }
 
+    //TODO remove this method, debug method
+    private void sendLineaInfo(String linea) {
 
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        String url = "http://www.amt.ct.it/MappaLinee/leggilineerichiestej.php?linee='"+linea+"','xx'";
+
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Receive the responce and send it to activity because through bundle
+                        // we can only pass flat data
+                        Bundle bundle = new Bundle();
+                        bundle.putString("response", response);
+                        busTraceReceiver.send(4, bundle);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(),
+                        "That didn't work!", Toast.LENGTH_SHORT)
+                        .show();
+            }
+        });
+        queue.add(stringRequest);
+    }
 
 
     /**
@@ -142,17 +173,14 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
      */
     private void tracingRequestor(){
 
-        /*
         if(timer != null){
             timer.cancel();
             timer = null;
         }
-        */
 
         timer = new Timer();
         initializeTimerTask();
         timer.schedule(busTracerTask, 2500, 5000);
-
 
     }
 

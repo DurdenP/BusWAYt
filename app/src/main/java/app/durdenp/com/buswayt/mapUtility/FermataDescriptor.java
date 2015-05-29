@@ -1,4 +1,4 @@
-package app.durdenp.com.buswayt.service;
+package app.durdenp.com.buswayt.mapUtility;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -9,19 +9,22 @@ public class FermataDescriptor {
 
     private String id;
     private String nome;
+    private String lineeTransito;
     private LatLng coordinates;
 
     /*Constructor*/
     public FermataDescriptor(){
         nome = null;
         id = null;
+        lineeTransito = null;
         coordinates = new LatLng(0.0, 0.0);
     }
 
     /*Constructor*/
-    public FermataDescriptor(String nome, String id, LatLng coordinates){
+    public FermataDescriptor(String nome, String id, String lineeTransito, LatLng coordinates){
         this.nome = nome;
         this.id = id;
+        this.lineeTransito = lineeTransito;
         this.coordinates = coordinates;
     }
 
@@ -73,4 +76,19 @@ public class FermataDescriptor {
         this.id = id;
     }
 
+    /**
+     *
+     * @return
+     */
+    public String getLineeTransito() {
+        return lineeTransito;
+    }
+
+    /**
+     *
+     * @param lineeTransito
+     */
+    public void setLineeTransito(String lineeTransito) {
+        this.lineeTransito = lineeTransito;
+    }
 }

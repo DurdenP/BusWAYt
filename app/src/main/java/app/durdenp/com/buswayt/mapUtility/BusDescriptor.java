@@ -1,4 +1,4 @@
-package app.durdenp.com.buswayt.service;
+package app.durdenp.com.buswayt.mapUtility;
 
 import com.google.android.gms.maps.model.LatLng;
 
