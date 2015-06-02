@@ -7,12 +7,10 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import app.durdenp.com.buswayt.R;
 import app.durdenp.com.buswayt.service.LocalizationService;
@@ -25,6 +23,7 @@ public class AutobusActivity extends ActionBarActivity {
     // boolean flag to toggle periodic location updates
     private boolean mRequestingLocationUpdates = false;
     private Button btnShowLocation, btnStartLocationUpdates;
+    Button imageButton;
 
 
     boolean mBound = false;
@@ -41,9 +40,10 @@ public class AutobusActivity extends ActionBarActivity {
     protected void onStart() {
         super.onStart();
         // Bind to LocalService
-        btnShowLocation = (Button) findViewById(R.id.btnShowLocation);
+//        btnShowLocation = (Button) findViewById(R.id.btnShowLocation);
         btnStartLocationUpdates = (Button) findViewById(R.id.btnLocationUpdates);
         Intent intent = new Intent(this, LocalizationService.class);
+        imageButton =(Button)findViewById(R.id.button4);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -90,6 +90,8 @@ public class AutobusActivity extends ActionBarActivity {
 
                 mRequestingLocationUpdates = true;
 
+                imageButton.setVisibility(View.VISIBLE);
+
                 // Starting the location updates
                 mService.startLocationUpdates();
 
@@ -101,6 +103,7 @@ public class AutobusActivity extends ActionBarActivity {
                         .setText("START LOCATION UPDATES");
 
                 mRequestingLocationUpdates = false;
+                imageButton.setVisibility(View.INVISIBLE);
 
                 // Stopping the location updates
                 mService.stopLocationUpdates();

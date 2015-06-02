@@ -104,7 +104,8 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
     @Override
     public void onConnected(Bundle bundle) {
         // Once connected with google api, get the location
-        displayLocation();
+
+        //displayLocation();
 
         if (mRequestingLocationUpdates) {
             startLocationUpdates();

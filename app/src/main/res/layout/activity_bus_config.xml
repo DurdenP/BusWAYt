@@ -11,53 +11,81 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="ID Bus"
+        android:textSize="30sp"
+        android:textColor="@color/background_material_dark"
+        android:textStyle="bold|italic"
+        android:textIsSelectable="false"
         android:id="@+id/textView2"
-        android:layout_marginTop="63dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignBottom="@+id/busIdEditText"
+        android:layout_alignStart="@+id/button3" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Linea"
+        android:textSize="30sp"
+        android:textColor="@color/background_material_dark"
+        android:textStyle="bold|italic"
+        android:textIsSelectable="false"
         android:id="@+id/textView3"
-        android:layout_below="@+id/textView2"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="30dp" />
+        android:layout_alignBottom="@+id/LineaIdEditText2"
+        android:layout_alignStart="@+id/textView2" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/busIdEditText"
-        android:layout_alignBottom="@+id/textView2"
-        android:layout_alignStart="@+id/button3"
-        android:width="120dp" />
+        android:width="120dp"
+        android:textColor="@color/background_material_dark"
+        android:layout_marginBottom="59dp"
+        android:layout_above="@+id/LineaIdEditText2"
+        android:layout_alignEnd="@+id/button3" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/LineaIdEditText2"
-        android:layout_above="@+id/saveCheckBox"
-        android:layout_alignEnd="@+id/busIdEditText"
-        android:width="120dp" />
+        android:width="120dp"
+        android:textColor="@color/background_material_dark"
+        android:layout_centerVertical="true"
+        android:layout_alignStart="@+id/busIdEditText" />
 
     <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Salva Preferenze"
         android:id="@+id/saveCheckBox"
-        android:layout_marginTop="40dp"
         android:checked="false"
-        android:layout_below="@+id/textView3"
-        android:layout_alignParentStart="true" />
+        android:textColor="@color/background_material_dark"
+        android:layout_marginBottom="37dp"
+        android:layout_above="@+id/button3"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Start Bus Localization Service"
         android:id="@+id/button3"
-        android:layout_centerVertical="true"
         android:onClick="startLocalizationService"
+        android:layout_marginBottom="51dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/btn_bg"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:textColor="@color/white"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BusWAYt"
+        android:id="@+id/textView11"
+        android:textSize="36sp"
+        android:typeface="serif"
+        android:textColor="@color/background_material_dark"
+        android:textStyle="bold|italic"
+        android:textIsSelectable="false"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

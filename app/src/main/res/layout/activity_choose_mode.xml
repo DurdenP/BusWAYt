@@ -77,8 +77,8 @@
         android:text="Bus Mode"
         android:textSize="20sp"
         android:id="@+id/textView9"
-        android:layout_below="@+id/button"
         android:textColor="@color/background_material_dark"
+        android:layout_below="@+id/button"
         android:layout_centerHorizontal="true" />
 
     <TextView
@@ -89,7 +89,7 @@
         android:textColor="@color/background_material_dark"
         android:id="@+id/textView10"
         android:layout_below="@+id/button2"
-        android:layout_alignStart="@+id/textView9" />
+        android:layout_centerHorizontal="true" />
 
 
 </RelativeLayout>

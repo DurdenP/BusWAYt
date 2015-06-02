@@ -1,25 +1,10 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/gold"
     android:gravity="center_horizontal"
     android:orientation="vertical" >
-
-    <ImageView
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="60dp"
-        android:src="@drawable/marker" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:text="@string/lbl_you_are_at"
-        android:textColor="@color/white"
-        android:textSize="25dp"
-        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/lblLocation"
@@ -28,30 +13,47 @@
         android:gravity="center_horizontal"
         android:padding="15dp"
         android:textColor="@color/white"
-        android:textSize="16dp" />
+        android:textSize="16dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
-    <Button
-        android:id="@+id/btnShowLocation"
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:background="@color/btn_bg"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:text="@string/btn_get_location"
-        android:onClick="showLocation"
-        android:textColor="@color/white" />
+        android:text="BusWAYt"
+        android:id="@+id/textView12"
+        android:textSize="36sp"
+        android:typeface="serif"
+        android:textColor="@color/background_material_dark"
+        android:textStyle="bold|italic"
+        android:textIsSelectable="false"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/lblLocation"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:id="@+id/btnLocationUpdates"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
         android:background="@color/btn_bg"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:text="@string/btn_start_location_updates"
         android:onClick="startLocationUpdates"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        android:layout_marginTop="95dp"
+        android:layout_below="@+id/textView12"
+        android:layout_centerHorizontal="true" />
 
-</LinearLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/button4"
+        android:background="@color/gold"
+        android:drawableBottom="@mipmap/busimage"
+        android:visibility="invisible"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="134dp" />
+
+</RelativeLayout>
