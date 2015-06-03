@@ -1,14 +1,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/asparago"
+
     tools:context="app.durdenp.com.buswayt.client.RequestLineaFragment">
 
     <TextView android:layout_width="match_parent" android:layout_height="match_parent"
         android:text="@string/hello_blank_fragment"
-        android:layout_alignParentLeft="true"
         android:layout_marginLeft="0dp"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="0dp" />
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -51,7 +52,9 @@
         android:layout_height="wrap_content"
         android:text="Visualizza Linea"
         android:id="@+id/traceLineaBtn"
-        android:layout_below="@+id/lineaChooseSpinner"
-        android:layout_alignParentStart="true"/>
+        android:textColor="@color/background_material_dark"
+        android:layout_marginBottom="48dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
