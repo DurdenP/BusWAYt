@@ -11,6 +11,7 @@ import android.os.ResultReceiver;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -79,6 +80,7 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         setContentView(R.layout.activity_client);
 
         lineaSetup = new LineaSetup();
+
 
         ViewPager vpPager = (ViewPager) findViewById(R.id.vpPager);
         adapterViewPager = new ClientActivityPagerAdapter(getSupportFragmentManager());
@@ -381,9 +383,9 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
     private int count = 0;
 
 
-    public LinkedList<BusDescriptor> getBusList(){
+    public ArrayList<BusDescriptor> getBusList(){
 
-        LinkedList<BusDescriptor> lista = new LinkedList();
+        ArrayList<BusDescriptor> lista = new ArrayList();
         count++;
         Log.w("getBusList", "count: " + count);
 
@@ -422,7 +424,7 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
 
     public void sendDataToBusListFragment(){
         if(busListFragment != null) {
-            busListFragment.refreshBusItemList(getBusList(), this);
+            busListFragment.refreshBusItemList(getBusList());
         }
     }
 
@@ -445,19 +447,22 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
             switch(resultCode){
                 case 1: /*Follow bus movement with camera*/
 
+                    manageBusPositionInfoResponce(resultData.getString("response"));
+
+                    /*
                     BusDescriptor bus = new BusDescriptor("CT130", "BRT");
                     LatLng coord = new LatLng(resultData.getDouble("latitude"), resultData.getDouble("longitude"));
                     bus.setCoordinates(coord);
                     bus.setSpeed(resultData.getDouble("speed"));
                     ArrayList<BusDescriptor> tmpArray = new ArrayList();
                     tmpArray.add(bus);
-
-                    sendDataToBusListFragment();
+                    */
+                    //sendDataToBusListFragment();
 
                     //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coord, 16));
 
                     //Calling print function
-                    printBusMarker(tmpArray);
+                    //printBusMarker(tmpArray);
                     break;
                 case 2: /*Processing a list of bus stops of selected line*/
                     manageBusStopInfoResponce(resultData.getString("response"));
@@ -471,8 +476,17 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         }
 
         private void manageBusPositionInfoResponce(String busPositionJSON){
-            LinkedList<BusDescriptor> busList = lineaSetup.parseBusPositionJSON(busPositionJSON);
 
+            ArrayList<BusDescriptor> busList = lineaSetup.parseBusPositionJSON(busPositionJSON);
+
+            if(busList != null && !busList.isEmpty()) {
+                //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(busList.get(0).getCoordinates(), 13));
+            }
+
+            printBusMarker(busList);
+
+            /*Manda delle cose fake*/
+            //sendDataToBusListFragment();
         }
 
         private void manageBusStopInfoResponce(String busStopJSON){
@@ -530,6 +544,7 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
      *
      *
      */
+
     public static class ClientActivityPagerAdapter extends FragmentPagerAdapter {
         private static int NUM_ITEMS = 2;
 

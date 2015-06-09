@@ -3,7 +3,11 @@ package app.durdenp.com.buswayt.mapUtility;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -11,6 +15,8 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import app.durdenp.com.buswayt.jsonWrapper.BusPositionWrapper;
+import app.durdenp.com.buswayt.jsonWrapper.FermateWrapper;
 import app.durdenp.com.buswayt.jsonWrapper.LineaRequestedWrapper;
 
 /**
@@ -307,9 +313,17 @@ public class LineaSetup {
      * @param busPositionJSON
      * @return
      */
-    public LinkedList<BusDescriptor> parseBusPositionJSON(String busPositionJSON){
-        LinkedList<BusDescriptor> busList = new LinkedList();
-        
+    public ArrayList<BusDescriptor> parseBusPositionJSON(String busPositionJSON){
+        ArrayList<BusDescriptor> busList = new ArrayList();
+
+        Type listType = new TypeToken<LinkedList<BusPositionWrapper>>() {}.getType();
+        Gson reader = new Gson();
+        LinkedList<BusPositionWrapper> busWrapperList = reader.fromJson(busPositionJSON, listType);
+
+        for(BusPositionWrapper tmp : busWrapperList){
+            busList.add(new BusDescriptor(tmp.getId(), tmp.getLinea(), new LatLng(tmp.getLat(), tmp.getLongi()), tmp.getVel()));
+        }
+
         return busList;
     }
 

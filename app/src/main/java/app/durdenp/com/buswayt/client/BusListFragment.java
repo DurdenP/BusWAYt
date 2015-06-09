@@ -5,12 +5,14 @@ import android.os.Bundle;
 //import android.app.Fragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
@@ -30,9 +32,9 @@ import app.durdenp.com.buswayt.mapUtility.BusDescriptor;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class BusListFragment extends Fragment implements AbsListView.OnItemClickListener {
+public class BusListFragment extends ListFragment implements AbsListView.OnItemClickListener {
 
-    private List<BusListItem> busListItem;
+    private ArrayList<BusListItem> busListItem;
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "page";
@@ -52,7 +54,7 @@ public class BusListFragment extends Fragment implements AbsListView.OnItemClick
      * The Adapter which will be used to populate the ListView/GridView with
      * Views.
      */
-    private ListAdapter mAdapter;
+    private BusListAdapter mAdapter;
 
     // TODO: Rename and change types of parameters
     public static BusListFragment newInstance(int page, String title) {
@@ -70,6 +72,7 @@ public class BusListFragment extends Fragment implements AbsListView.OnItemClick
      */
     public BusListFragment() {
     }
+    ArrayList<BusDescriptor> busDescriptorList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,10 +82,6 @@ public class BusListFragment extends Fragment implements AbsListView.OnItemClick
             mPage = getArguments().getInt(ARG_PARAM1);
             mTitle = getArguments().getString(ARG_PARAM2);
         }
-
-        ClientActivity activity = (ClientActivity)getActivity();
-        refreshBusItemList(activity.getBusList(), getActivity());
-
     }
 
 
@@ -93,6 +92,20 @@ public class BusListFragment extends Fragment implements AbsListView.OnItemClick
 
         // Set the adapter
         mListView = (AbsListView) view.findViewById(android.R.id.list);
+
+        ClientActivity activity = (ClientActivity)getActivity();
+
+        busDescriptorList = activity.getBusList();
+        busListItem = new ArrayList();
+
+        if(!busDescriptorList.isEmpty()){
+            for(BusDescriptor bus : busDescriptorList){
+                BusListItem tmp = new BusListItem(bus.getId(), bus.getLinea(), bus.getSpeed(), bus.getPrevArrivalTime(), bus.getNextBusStop().getNome());
+                busListItem.add(tmp);
+            }
+        }
+
+        mAdapter = new BusListAdapter(getActivity(), busListItem);
         ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
 
         // Set OnItemClickListener so we can be notified on item clicks
@@ -161,7 +174,10 @@ public class BusListFragment extends Fragment implements AbsListView.OnItemClick
     }
 
 
-    public void refreshBusItemList(LinkedList<BusDescriptor> busDescriptorList, FragmentActivity activity){
+    public void refreshBusItemList(ArrayList<BusDescriptor> busDescriptorListRefr){
+
+        mAdapter.clear();
+
         busListItem = new ArrayList();
 
         if(!busDescriptorList.isEmpty()){
@@ -170,11 +186,12 @@ public class BusListFragment extends Fragment implements AbsListView.OnItemClick
                 busListItem.add(tmp);
             }
         }
-        //FragmentActivity activity = getActivity();
 
-        if(activity != null) {
+        mAdapter.notifyDataSetChanged();
+        /*
+         if(getActivity() != null) {
             //mAdapter = new BusListAdapter(getActivity(), busListItem);
-            mAdapter = new BusListAdapter(activity, busListItem);
+            mAdapter = new BusListAdapter(getActivity(), busListItem);
             if(mListView != null) {
                 mListView.setAdapter(mAdapter);
             }
@@ -182,5 +199,6 @@ public class BusListFragment extends Fragment implements AbsListView.OnItemClick
         }else{
             Log.w("refreshBusItemList", "activity is NULL");
         }
+        */
     }
 }

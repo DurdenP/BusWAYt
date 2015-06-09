@@ -33,7 +33,7 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
     private ResultReceiver busTraceReceiver;
     private String city;
     private String idLinea;
-    //private String busID;
+    private String busID = "14a";
 
     private Timer timer;
     private TimerTask busTracerTask;
@@ -127,7 +127,7 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
                         Bundle bundle = new Bundle();
                         bundle.putString("response", response);
                         busTraceReceiver.send(2, bundle);
-                        //TODO insert trace request
+                        //TODO adjust trace request
                         tracingRequest();
                     }
                 }, new Response.ErrorListener() {
@@ -136,6 +136,7 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
                 Toast.makeText(getApplicationContext(),
                         "That didn't work!", Toast.LENGTH_SHORT)
                         .show();
+                tracingRequest();
             }
         });
         queue.add(stringRequest);
@@ -147,6 +148,7 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
     private void sendLineaInfoRequest() {
 
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        //String url = "http://localhost:8080/line";
         String url = "http://www.amt.ct.it/MappaLinee/leggilineerichiestej.php?linee='"+idLinea+"','xx'";
 
         // Request a string response from the provided URL.
@@ -187,7 +189,6 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
         timer = new Timer();
         initializeTimerTask();
         timer.schedule(busTracerTask, 2500, 5000);
-
     }
 
     public void initializeTimerTask() {
@@ -201,26 +202,40 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
                 handler.post(new Runnable() {
 
                     public void run() {
-                        /* TODO
+                        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+                        String url = "";
+
                         if(busID != null) {
-                            faccio richiesta solo per lo specifico bus
+                            // faccio richiesta solo per lo specifico bus
+                            url = "http://151.97.157.200:8080/lineinfo?linea="+ busID;
+                            //url = "http://151.97.63.136:8080/lineinfo?linea="+ busID;
                         } else {
-                            faccio richiesta per tutti i bus della linea
+                            //   faccio richiesta per tutti i bus della linea
+                            url = "http://151.97.157.200:8080/lineinfo?linea="+ busID;
+                            //url = "http://151.97.63.136:8080/lineinfo?linea="+ busID;
                         }
-                         */
 
-                        //get the current timeStamp
-                        /*
-                        Toast.makeText(getApplicationContext(),
-                                "Sending messages", Toast.LENGTH_LONG).show();
-                        */
-                        count++;
-                        Bundle bundle = new Bundle();
-                        bundle.putDouble("latitude", 37.541386 + (count*0.00003));
-                        bundle.putDouble("longitude", 15.078818+(count*0.00003));
-                        bundle.putDouble("speed", 25.5);
-                        busTraceReceiver.send(1, bundle);
+                        // Request a string response from the provided URL.
+                        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                                new Response.Listener<String>() {
+                                    @Override
+                                    public void onResponse(String response) {
+                                        // Receive the responce and send it to activity because through bundle
+                                        // we can only pass flat data
+                                        Bundle bundle = new Bundle();
+                                        bundle.putString("response", response);
+                                        busTraceReceiver.send(1, bundle);
 
+                                    }
+                                }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Toast.makeText(getApplicationContext(),
+                                        "That didn't work! BusInfo", Toast.LENGTH_SHORT)
+                                        .show();
+                            }
+                        });
+                        queue.add(stringRequest);
                     }
                 });
             }
