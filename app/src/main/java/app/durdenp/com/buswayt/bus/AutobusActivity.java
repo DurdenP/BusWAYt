@@ -24,6 +24,8 @@ public class AutobusActivity extends ActionBarActivity {
     private boolean mRequestingLocationUpdates = false;
     private Button btnShowLocation, btnStartLocationUpdates;
     Button imageButton;
+    String lineaid;
+    String busid;
 
 
     boolean mBound = false;
@@ -32,6 +34,10 @@ public class AutobusActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_autobus);
+
+        Bundle extras = getIntent().getExtras();
+        lineaid= extras.getString("lineaid");
+        busid=extras.getString("busid");
 
     }
 
@@ -44,6 +50,8 @@ public class AutobusActivity extends ActionBarActivity {
         btnStartLocationUpdates = (Button) findViewById(R.id.btnLocationUpdates);
         Intent intent = new Intent(this, LocalizationService.class);
         imageButton =(Button)findViewById(R.id.button4);
+        intent.putExtra("lineaid",lineaid);
+        intent.putExtra("busid",busid);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 

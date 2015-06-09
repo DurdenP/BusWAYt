@@ -10,12 +10,24 @@ import android.util.Log;
 
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import app.durdenp.com.buswayt.bus.CustomRequest;
 
 public class LocalizationService extends Service implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -29,9 +41,13 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
 
     private boolean mRequestingLocationUpdates = false;
 
+    String address="http://151.97.157.200:8080/";
 
 
     private LocationRequest mLocationRequest;
+
+    String lineaid;
+    String busid;
 
     // Location updates intervals in sec
     private static int UPDATE_INTERVAL = 10000; // 10 sec
@@ -50,7 +66,6 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
 
     @Override
     public void onCreate(){
-
 
         // First we need to check availability of play services
         if (checkPlayServices()) {
@@ -93,7 +108,9 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
     @Override
     public IBinder onBind(Intent intent) {
 
-
+        Bundle extras = intent.getExtras();
+        lineaid= extras.getString("lineaid");
+        busid=extras.getString("busid");
 
         return mBinder;
     }
@@ -143,12 +160,15 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
         if (mLastLocation != null) {
             double latitude = mLastLocation.getLatitude();
             double longitude = mLastLocation.getLongitude();
-
+            float speed = mLastLocation.getSpeed();
 
             Toast.makeText(getApplicationContext(),
-                    "Latitude:"+ latitude +", "+ "Longitude: "+ longitude, Toast.LENGTH_LONG)
+                    "Lineaid: "+ lineaid +", "+" Busid: "+ busid +", "+" Latitude: "+ latitude +", "+ " Longitude: "+ longitude +", "+" Speed: " + speed, Toast.LENGTH_LONG)
                     .show();
 
+            //sendHttpRquest(String busid, String lineaid, double latitude, double longitude, float speed)
+
+            sendHttpRequest(busid,lineaid, latitude, longitude,speed);
 
         } else {
 
@@ -157,6 +177,44 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
                     "(Couldn't get the location. Make sure location is enabled on the device)", Toast.LENGTH_LONG)
                     .show();
         }
+    }
+
+
+    public void sendHttpRequest(String busid, String lineaid, double latitude, double longitude, float speed)
+    {
+        String url =address+"businfo";
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        Map<String, String> params = new HashMap<>();
+        params.put("speed", String.valueOf(speed));
+        params.put("longitude", String.valueOf(longitude));
+        params.put("latitude",String.valueOf(latitude));
+        params.put("busid", busid);
+        params.put("lineaid", lineaid);
+
+        CustomRequest jsObjRequest = new CustomRequest(Request.Method.PUT, url, params, new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.d("Response: ", response.toString());
+
+                Toast.makeText(getApplicationContext(),
+                        "Response: "+ response.toString(), Toast.LENGTH_LONG)
+                        .show();
+
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError response) {
+                Log.d("Error Response: ", response.toString());
+            }
+        });
+
+        queue.add(jsObjRequest);
+
+
+
     }
 
 

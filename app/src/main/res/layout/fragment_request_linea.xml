@@ -52,7 +52,7 @@
         android:layout_height="wrap_content"
         android:text="Visualizza Linea"
         android:id="@+id/traceLineaBtn"
-        android:textColor="@color/background_material_dark"
+        android:textColor="@color/white"
         android:layout_marginBottom="48dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
