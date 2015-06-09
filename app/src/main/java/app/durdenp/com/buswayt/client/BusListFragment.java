@@ -4,19 +4,24 @@ import android.app.Activity;
 import android.os.Bundle;
 //import android.app.Fragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import app.durdenp.com.buswayt.R;
+import app.durdenp.com.buswayt.mapUtility.BusDescriptor;
 
 /**
  * A fragment representing a list of Items.
@@ -27,9 +32,9 @@ import app.durdenp.com.buswayt.R;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class BusListFragment extends Fragment implements AbsListView.OnItemClickListener {
+public class BusListFragment extends ListFragment implements AbsListView.OnItemClickListener {
 
-    private List<BusListItem> busListItem;
+    private ArrayList<BusListItem> busListItem;
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "page";
@@ -49,7 +54,7 @@ public class BusListFragment extends Fragment implements AbsListView.OnItemClick
      * The Adapter which will be used to populate the ListView/GridView with
      * Views.
      */
-    private ListAdapter mAdapter;
+    private BusListAdapter mAdapter;
 
     // TODO: Rename and change types of parameters
     public static BusListFragment newInstance(int page, String title) {
@@ -67,6 +72,7 @@ public class BusListFragment extends Fragment implements AbsListView.OnItemClick
      */
     public BusListFragment() {
     }
+    ArrayList<BusDescriptor> busDescriptorList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,19 +82,6 @@ public class BusListFragment extends Fragment implements AbsListView.OnItemClick
             mPage = getArguments().getInt(ARG_PARAM1);
             mTitle = getArguments().getString(ARG_PARAM2);
         }
-
-        busListItem = new ArrayList();
-        busListItem.add(new BusListItem("CT051", "201", 30.5, 12));
-        busListItem.add(new BusListItem("CT052", "201", 15.5, 4));
-        busListItem.add(new BusListItem("CT053", "201", 15.5, 5));
-        busListItem.add(new BusListItem("CT054", "201", 25.5, 10));
-        busListItem.add(new BusListItem("CT061", "201", 25.5, 8));
-        busListItem.add(new BusListItem("CT062", "201", 5.5, 8));
-        busListItem.add(new BusListItem("CT063", "201", 3.5, 1));
-        busListItem.add(new BusListItem("CT064", "201", 30.5, 3));
-
-        // TODO: Change Adapter to display your content
-        mAdapter = new BusListAdapter(getActivity(), busListItem);
     }
 
 
@@ -99,6 +92,20 @@ public class BusListFragment extends Fragment implements AbsListView.OnItemClick
 
         // Set the adapter
         mListView = (AbsListView) view.findViewById(android.R.id.list);
+
+        ClientActivity activity = (ClientActivity)getActivity();
+
+        busDescriptorList = activity.getBusList();
+        busListItem = new ArrayList();
+
+        if(!busDescriptorList.isEmpty()){
+            for(BusDescriptor bus : busDescriptorList){
+                BusListItem tmp = new BusListItem(bus.getId(), bus.getLinea(), bus.getSpeed(), bus.getPrevArrivalTime(), bus.getNextBusStop().getNome());
+                busListItem.add(tmp);
+            }
+        }
+
+        mAdapter = new BusListAdapter(getActivity(), busListItem);
         ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
 
         // Set OnItemClickListener so we can be notified on item clicks
@@ -166,4 +173,32 @@ public class BusListFragment extends Fragment implements AbsListView.OnItemClick
         public void onFragmentInteraction(String id);
     }
 
+
+    public void refreshBusItemList(ArrayList<BusDescriptor> busDescriptorListRefr){
+
+        mAdapter.clear();
+
+        busListItem = new ArrayList();
+
+        if(!busDescriptorList.isEmpty()){
+            for(BusDescriptor bus : busDescriptorList){
+                BusListItem tmp = new BusListItem(bus.getId(), bus.getLinea(), bus.getSpeed(), bus.getPrevArrivalTime(), bus.getNextBusStop().getNome());
+                busListItem.add(tmp);
+            }
+        }
+
+        mAdapter.notifyDataSetChanged();
+        /*
+         if(getActivity() != null) {
+            //mAdapter = new BusListAdapter(getActivity(), busListItem);
+            mAdapter = new BusListAdapter(getActivity(), busListItem);
+            if(mListView != null) {
+                mListView.setAdapter(mAdapter);
+            }
+            Log.w("refreshBusItemList", "activity is != NULL");
+        }else{
+            Log.w("refreshBusItemList", "activity is NULL");
+        }
+        */
+    }
 }

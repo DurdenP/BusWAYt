@@ -11,6 +11,7 @@ import android.os.ResultReceiver;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -373,11 +374,58 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         }
 
         for(BusDescriptor tmpDesc : bus){
-            busMarker.add(googleMap.addMarker(new MarkerOptions().title(tmpDesc.getId()).position(tmpDesc.getCoordinates()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))));
-
+            busMarker.add(googleMap.addMarker(new MarkerOptions().title(tmpDesc.getId()).position(tmpDesc.getCoordinates()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))));
         }
     }
 
+
+    private int count = 0;
+
+
+    public ArrayList<BusDescriptor> getBusList(){
+
+        ArrayList<BusDescriptor> lista = new ArrayList();
+        count++;
+        Log.w("getBusList", "count: " + count);
+
+        BusDescriptor tmp = new BusDescriptor("CT051" + count, "201");
+        tmp.setNextBusStop(new FermataDescriptor("NOMEFERMATA1", "IDFERMATA", "molte linee"));
+        tmp.setSpeed(10.2);
+        lista.add(tmp);
+
+        tmp = new BusDescriptor("CT052" + count, "201");
+        tmp.setNextBusStop(new FermataDescriptor("NOMEFERMATA2", "IDFERMATA", "molte linee"));
+        tmp.setSpeed(10.2);
+        lista.add(tmp);
+
+        tmp = new BusDescriptor("CT053" + count, "201");
+        tmp.setNextBusStop(new FermataDescriptor("NOMEFERMATA3", "IDFERMATA", "molte linee"));
+        tmp.setSpeed(10.2);
+        lista.add(tmp);
+
+        tmp = new BusDescriptor("CT061" + count, "201");
+        tmp.setNextBusStop(new FermataDescriptor("NOMEFERMATA4", "IDFERMATA", "molte linee"));
+        tmp.setSpeed(10.2);
+        lista.add(tmp);
+
+        tmp = new BusDescriptor("CT081" + count, "201");
+        tmp.setNextBusStop(new FermataDescriptor("NOMEFERMATA5", "IDFERMATA", "molte linee"));
+        tmp.setSpeed(10.2);
+        lista.add(tmp);
+
+        tmp = new BusDescriptor("CT082" + count, "201");
+        tmp.setNextBusStop(new FermataDescriptor("NOMEFERMATA6", "IDFERMATA", "molte linee"));
+        tmp.setSpeed(10.2);
+        lista.add(tmp);
+
+        return lista;
+    }
+
+    public void sendDataToBusListFragment(){
+        if(busListFragment != null) {
+            busListFragment.refreshBusItemList(getBusList());
+        }
+    }
 
     class BusPositionReceiver extends ResultReceiver{
 
@@ -397,17 +445,23 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
 
             switch(resultCode){
                 case 1: /*Follow bus movement with camera*/
+
+                    manageBusPositionInfoResponce(resultData.getString("response"));
+
+                    /*
                     BusDescriptor bus = new BusDescriptor("CT130", "BRT");
                     LatLng coord = new LatLng(resultData.getDouble("latitude"), resultData.getDouble("longitude"));
                     bus.setCoordinates(coord);
                     bus.setSpeed(resultData.getDouble("speed"));
                     ArrayList<BusDescriptor> tmpArray = new ArrayList();
                     tmpArray.add(bus);
+                    */
+                    //sendDataToBusListFragment();
 
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coord, 16));
+                    //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coord, 16));
 
                     //Calling print function
-                    printBusMarker(tmpArray);
+                    //printBusMarker(tmpArray);
                     break;
                 case 2: /*Processing a list of bus stops of selected line*/
                     manageBusStopInfoResponce(resultData.getString("response"));
@@ -421,8 +475,17 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         }
 
         private void manageBusPositionInfoResponce(String busPositionJSON){
-            LinkedList<BusDescriptor> busList = lineaSetup.parseBusPositionJSON(busPositionJSON);
 
+            ArrayList<BusDescriptor> busList = lineaSetup.parseBusPositionJSON(busPositionJSON);
+
+            if(busList != null && !busList.isEmpty()) {
+                //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(busList.get(0).getCoordinates(), 13));
+            }
+
+            printBusMarker(busList);
+
+            /*Manda delle cose fake*/
+            //sendDataToBusListFragment();
         }
 
         private void manageBusStopInfoResponce(String busStopJSON){
