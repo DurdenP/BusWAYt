@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 //import android.app.Fragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +15,11 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import app.durdenp.com.buswayt.R;
+import app.durdenp.com.buswayt.mapUtility.BusDescriptor;
 
 /**
  * A fragment representing a list of Items.
@@ -77,18 +80,9 @@ public class BusListFragment extends Fragment implements AbsListView.OnItemClick
             mTitle = getArguments().getString(ARG_PARAM2);
         }
 
-        busListItem = new ArrayList();
-        busListItem.add(new BusListItem("CT051", "201", 30.5, 12));
-        busListItem.add(new BusListItem("CT052", "201", 15.5, 4));
-        busListItem.add(new BusListItem("CT053", "201", 15.5, 5));
-        busListItem.add(new BusListItem("CT054", "201", 25.5, 10));
-        busListItem.add(new BusListItem("CT061", "201", 25.5, 8));
-        busListItem.add(new BusListItem("CT062", "201", 5.5, 8));
-        busListItem.add(new BusListItem("CT063", "201", 3.5, 1));
-        busListItem.add(new BusListItem("CT064", "201", 30.5, 3));
+        ClientActivity activity = (ClientActivity)getActivity();
+        refreshBusItemList(activity.getBusList(), getActivity());
 
-        // TODO: Change Adapter to display your content
-        mAdapter = new BusListAdapter(getActivity(), busListItem);
     }
 
 
@@ -166,4 +160,27 @@ public class BusListFragment extends Fragment implements AbsListView.OnItemClick
         public void onFragmentInteraction(String id);
     }
 
+
+    public void refreshBusItemList(LinkedList<BusDescriptor> busDescriptorList, FragmentActivity activity){
+        busListItem = new ArrayList();
+
+        if(!busDescriptorList.isEmpty()){
+            for(BusDescriptor bus : busDescriptorList){
+                BusListItem tmp = new BusListItem(bus.getId(), bus.getLinea(), bus.getSpeed(), bus.getPrevArrivalTime(), bus.getNextBusStop().getNome());
+                busListItem.add(tmp);
+            }
+        }
+        //FragmentActivity activity = getActivity();
+
+        if(activity != null) {
+            //mAdapter = new BusListAdapter(getActivity(), busListItem);
+            mAdapter = new BusListAdapter(activity, busListItem);
+            if(mListView != null) {
+                mListView.setAdapter(mAdapter);
+            }
+            Log.w("refreshBusItemList", "activity is != NULL");
+        }else{
+            Log.w("refreshBusItemList", "activity is NULL");
+        }
+    }
 }

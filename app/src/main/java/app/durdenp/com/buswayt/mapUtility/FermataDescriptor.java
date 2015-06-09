@@ -21,6 +21,14 @@ public class FermataDescriptor {
     }
 
     /*Constructor*/
+    public FermataDescriptor(String nome, String id, String lineeTransito){
+        this.nome = nome;
+        this.id = id;
+        this.lineeTransito = lineeTransito;
+        this.coordinates = null;
+    }
+
+    /*Constructor*/
     public FermataDescriptor(String nome, String id, String lineeTransito, LatLng coordinates){
         this.nome = nome;
         this.id = id;

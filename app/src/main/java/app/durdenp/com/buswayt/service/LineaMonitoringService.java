@@ -128,6 +128,7 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
                         bundle.putString("response", response);
                         busTraceReceiver.send(2, bundle);
                         //TODO insert trace request
+                        tracingRequest();
                     }
                 }, new Response.ErrorListener() {
             @Override

@@ -11,7 +11,9 @@ public class BusListItem {
     private String id;
     private String linea;
     private double speed;
+    private String fermata;
     private int arrivoPrevisto;
+
 
     //Constructors
 
@@ -24,6 +26,7 @@ public class BusListItem {
         this.linea = null;
         this.speed = 0;
         this.arrivoPrevisto = 0;
+        this.fermata = null;
     }
 
     /**
@@ -66,6 +69,19 @@ public class BusListItem {
     public BusListItem(String id, String linea, double speed, int arrivoPrevisto) {
         this(id, linea, speed);
         this.arrivoPrevisto = arrivoPrevisto;
+    }
+
+    /**
+     *
+     * @param id
+     * @param linea
+     * @param speed
+     * @param arrivoPrevisto
+     * @param prossimaFermata
+     */
+    public BusListItem(String id, String linea, double speed, int arrivoPrevisto, String prossimaFermata) {
+        this(id, linea, speed, arrivoPrevisto);
+        this.fermata = prossimaFermata;
     }
 
     /**
@@ -130,6 +146,22 @@ public class BusListItem {
      */
     public void setArrivoPrevisto(int arrivoPrevisto) {
         this.arrivoPrevisto = arrivoPrevisto;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getFermata() {
+        return fermata;
+    }
+
+    /**
+     *
+     * @param fermata
+     */
+    public void setFermata(String fermata) {
+        this.fermata = fermata;
     }
 
     @Override
