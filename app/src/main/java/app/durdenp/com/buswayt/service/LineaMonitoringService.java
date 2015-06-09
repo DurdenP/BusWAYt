@@ -188,7 +188,7 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
 
         timer = new Timer();
         initializeTimerTask();
-        timer.schedule(busTracerTask, 2500, 5000);
+        timer.schedule(busTracerTask, 1000, 1000);
     }
 
     public void initializeTimerTask() {
