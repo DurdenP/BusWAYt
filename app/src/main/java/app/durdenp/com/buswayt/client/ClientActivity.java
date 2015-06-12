@@ -20,6 +20,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -33,12 +39,17 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONObject;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.Map;
 
 import app.durdenp.com.buswayt.R;
+import app.durdenp.com.buswayt.bus.CustomRequest;
 import app.durdenp.com.buswayt.jsonWrapper.LineaRequestedWrapper;
 import app.durdenp.com.buswayt.mapUtility.BusDescriptor;
 import app.durdenp.com.buswayt.mapUtility.FermataDescriptor;
@@ -72,6 +83,7 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
     ClientActivityPagerAdapter adapterViewPager;
     BusListFragment busListFragment;
 
+    String lineEndPoint="http://151.97.157.157:8080/line";
 
 
     @Override
@@ -269,7 +281,9 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
 
         switch(citySelected){
             case "Catania":
+
                 position = new LatLng(37.524940, 15.073690);
+                sendHttpRequest();
                 break;
             case "Palermo":
                 position = new LatLng(38.120113, 13.356774);
@@ -282,6 +296,44 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         if(googleMap != null){
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 14));
         }
+    }
+
+
+    public void sendHttpRequest()
+    {
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url ="http://151.97.157.157:8080/line";
+
+// Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the first 500 characters of the response string.
+
+                        System.out.println(response);
+                        Toast.makeText(getApplicationContext(),
+                                "Response: "+ response.toString(), Toast.LENGTH_LONG)
+                                .show();
+
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                Toast.makeText(getApplicationContext(),
+                        "That didn't work!", Toast.LENGTH_LONG)
+                        .show();
+
+            }
+        });
+// Add the request to the RequestQueue.
+        queue.add(stringRequest);
+
+
+
     }
 
     /**
@@ -320,9 +372,9 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
             latitude = latitude + tmp.getCoordinates().latitude;
             longitude = longitude + tmp.getCoordinates().longitude;
             if(stopCount == 1){/*Capolinea*/
-                busStopArray.add(googleMap.addMarker(new MarkerOptions().title(tmp.getNome()).position(tmp.getCoordinates()).snippet("Linee in Transito: " + tmp.getLineeTransito()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))));
+                busStopArray.add(googleMap.addMarker(new MarkerOptions().title(tmp.getNome()).position(tmp.getCoordinates()).snippet("Linee in Transito: " + tmp.getLineeTransito()).icon(BitmapDescriptorFactory.fromResource(R.mipmap.cap2))));
             }else {
-                busStopArray.add(googleMap.addMarker(new MarkerOptions().title(tmp.getNome()).position(tmp.getCoordinates()).snippet("Linee in Transito: " + tmp.getLineeTransito()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))));
+                busStopArray.add(googleMap.addMarker(new MarkerOptions().title(tmp.getNome()).position(tmp.getCoordinates()).snippet("Linee in Transito: " + tmp.getLineeTransito()).icon(BitmapDescriptorFactory.fromResource(R.mipmap.fer2))));
             }
         }
 

@@ -41,7 +41,7 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
 
     private boolean mRequestingLocationUpdates = false;
 
-    String address="http://151.97.157.200:8080/";
+    String address="http://151.97.157.157:8080/";
 
 
     private LocationRequest mLocationRequest;
@@ -100,6 +100,7 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
     @Override
     public void onDestroy(){
         Toast.makeText(getApplicationContext(),
+
                 "Il service e' stato terminato", Toast.LENGTH_LONG).show();
 
 

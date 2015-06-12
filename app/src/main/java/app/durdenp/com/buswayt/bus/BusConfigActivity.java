@@ -43,7 +43,7 @@ import java.util.Map;
 import app.durdenp.com.buswayt.R;
 
 public class BusConfigActivity extends ActionBarActivity {
-    String address="http://151.97.157.200:8080/";
+    String address="http://151.97.157.157:8080/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
