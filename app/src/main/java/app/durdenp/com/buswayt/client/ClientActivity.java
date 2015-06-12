@@ -475,17 +475,20 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         }
 
         private void manageBusPositionInfoResponce(String busPositionJSON){
+            if(busPositionJSON.compareTo("none") == 0){
+                sendDataToBusListFragment();
+            }else {
+                ArrayList<BusDescriptor> busList = lineaSetup.parseBusPositionJSON(busPositionJSON);
 
-            ArrayList<BusDescriptor> busList = lineaSetup.parseBusPositionJSON(busPositionJSON);
+                if (busList != null && !busList.isEmpty()) {
+                    //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(busList.get(0).getCoordinates(), 13));
+                }
 
-            if(busList != null && !busList.isEmpty()) {
-                //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(busList.get(0).getCoordinates(), 13));
-            }
-
-            printBusMarker(busList);
+                printBusMarker(busList);
 
             /*Manda delle cose fake*/
-            //sendDataToBusListFragment();
+                //sendDataToBusListFragment();
+            }
         }
 
         private void manageBusStopInfoResponce(String busStopJSON){

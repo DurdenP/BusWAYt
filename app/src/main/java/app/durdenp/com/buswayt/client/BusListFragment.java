@@ -32,7 +32,7 @@ import app.durdenp.com.buswayt.mapUtility.BusDescriptor;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class BusListFragment extends ListFragment implements AbsListView.OnItemClickListener {
+public class BusListFragment extends Fragment implements AbsListView.OnItemClickListener {
 
     private ArrayList<BusListItem> busListItem;
 
@@ -44,6 +44,7 @@ public class BusListFragment extends ListFragment implements AbsListView.OnItemC
     private String mTitle;
 
     private OnFragmentInteractionListener mListener;
+    private Activity activityAttached;
 
     /**
      * The fragment's ListView/GridView.
@@ -72,6 +73,7 @@ public class BusListFragment extends ListFragment implements AbsListView.OnItemC
      */
     public BusListFragment() {
     }
+
     ArrayList<BusDescriptor> busDescriptorList;
 
     @Override
@@ -119,7 +121,9 @@ public class BusListFragment extends ListFragment implements AbsListView.OnItemC
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
+            activityAttached = activity;
             mListener = (OnFragmentInteractionListener) activity;
+
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -174,31 +178,17 @@ public class BusListFragment extends ListFragment implements AbsListView.OnItemC
     }
 
 
-    public void refreshBusItemList(ArrayList<BusDescriptor> busDescriptorListRefr){
-
-        mAdapter.clear();
-
+    public void refreshBusItemList(ArrayList<BusDescriptor> busDescriptorListRefr) {
         busListItem = new ArrayList();
 
-        if(!busDescriptorList.isEmpty()){
-            for(BusDescriptor bus : busDescriptorList){
+        if(!busDescriptorListRefr.isEmpty()){
+            for(BusDescriptor bus : busDescriptorListRefr){
                 BusListItem tmp = new BusListItem(bus.getId(), bus.getLinea(), bus.getSpeed(), bus.getPrevArrivalTime(), bus.getNextBusStop().getNome());
                 busListItem.add(tmp);
             }
         }
 
-        mAdapter.notifyDataSetChanged();
-        /*
-         if(getActivity() != null) {
-            //mAdapter = new BusListAdapter(getActivity(), busListItem);
-            mAdapter = new BusListAdapter(getActivity(), busListItem);
-            if(mListView != null) {
-                mListView.setAdapter(mAdapter);
-            }
-            Log.w("refreshBusItemList", "activity is != NULL");
-        }else{
-            Log.w("refreshBusItemList", "activity is NULL");
-        }
-        */
+        mAdapter = new BusListAdapter(activityAttached, busListItem);
+
     }
 }
