@@ -48,7 +48,7 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDKmwLXk4ify6J0ZVIj1AzF0Wzd2bOQug0" />
+            android:value="AIzaSyDhBMr_qq-oZAm-yqHGHCerJL1GJz3WkDs" />
 
         <activity
             android:name=".bus.BusConfigActivity"
@@ -64,5 +64,6 @@
 
 </manifest><!--
     DurdenP API KEY: AIzaSyAg-99bfINtKg6ep0RNkDffiG8Xrpc-W2Y
-    Maverikf14 API KEY AIzaSyDKmwLXk4ify6J0ZVIj1AzF0Wzd2bOQug0
+    Maverikf14 API KEY AIzaSyCaUzwC1x-0RE9RM4KNR80k3yj_VSMH7tg
+                       AIzaSyDhBMr_qq-oZAm-yqHGHCerJL1GJz3WkDs
 -->

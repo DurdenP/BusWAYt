@@ -25,21 +25,11 @@
         android:background="#eee"
         android:orientation="vertical">
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/vpPager"
-            android:background="@color/btn_bg"
+        <fragment android:name="app.durdenp.com.buswayt.client.RequestLineaFragment"
+            android:id="@+id/article_fragment"
+            android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent" />
 
-            <android.support.v4.view.PagerTabStrip
-                android:id="@+id/pager_header"
-                android:background="@color/btn_bg"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top"
-                android:paddingBottom="4dp"
-                android:paddingTop="4dp" />
-
-        </android.support.v4.view.ViewPager>
     </LinearLayout>
 </LinearLayout>

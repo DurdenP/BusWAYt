@@ -1,5 +1,6 @@
 package app.durdenp.com.buswayt.client;
 
+import android.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -8,11 +9,6 @@ import android.graphics.Color;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.ResultReceiver;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -39,8 +35,6 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import org.json.JSONObject;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,14 +53,13 @@ import app.durdenp.com.buswayt.mapUtility.LineaSetup;
 import app.durdenp.com.buswayt.service.LineaMonitoringService;
 
 
-public class ClientActivity extends ActionBarActivity implements RequestLineaFragment.OnFragmentInteractionListener, BusListFragment.OnFragmentInteractionListener {
+public class ClientActivity extends ActionBarActivity implements RequestLineaFragment.OnFragmentInteractionListener {
 
     private GoogleMap googleMap;
     private LineaMonitoringService lineaServiceConnection;
     private boolean mBound = false;
 
     private LineaSetup lineaSetup;
-
 
     //Description Bus Stop variable
     private LineaDescriptor linea;
@@ -78,56 +71,12 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
     BusPositionReceiver tracingReceiver;
     ArrayList<Marker> busMarker;
 
-
-    //Page Adapter
-    ClientActivityPagerAdapter adapterViewPager;
-    BusListFragment busListFragment;
-
-    String lineEndPoint="http://151.97.157.157:8080/line";
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client);
 
         lineaSetup = new LineaSetup();
-
-        ViewPager vpPager = (ViewPager) findViewById(R.id.vpPager);
-        adapterViewPager = new ClientActivityPagerAdapter(getSupportFragmentManager());
-        vpPager.setAdapter(adapterViewPager);
-
-
-        vpPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
-            // This method will be invoked when a new page becomes selected.
-            @Override
-            public void onPageSelected(int position) {
-                switch (position) {
-                    case 0:
-                        RequestLineaFragment reqLFragment = (RequestLineaFragment) adapterViewPager.getItem(position);
-                        reqLFragment.setArguments(getIntent().getExtras());
-                        break;
-                    case 1:
-                        busListFragment = (BusListFragment) adapterViewPager.getItem(position);
-                        busListFragment.setArguments(getIntent().getExtras());
-                        break;
-                }
-            }
-
-            // This method will be invoked when the current page is scrolled
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                // Code goes here
-            }
-
-            // Called when the scroll state changes:
-            // SCROLL_STATE_IDLE, SCROLL_STATE_DRAGGING, SCROLL_STATE_SETTLING
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                // Code goes here
-            }
-        });
 
         //Tracing bus configuration
         tracingReceiver = new BusPositionReceiver(null);
@@ -263,25 +212,11 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         }
     }
 
-    /**
-     * Refer to BusListFragment
-     * @param id
-     */
-    @Override
-    public void onFragmentInteraction(String id) {
-        /*TODO busListFragment Interaction Listener*/
-        Toast.makeText(this, id + " Clicked!"
-                , Toast.LENGTH_SHORT).show();
-
-
-    }
-
     private void centerMapToCitySelected(){
         LatLng position = new LatLng(37.524940, 15.073690);
 
         switch(citySelected){
             case "Catania":
-
                 position = new LatLng(37.524940, 15.073690);
                 sendHttpRequest();
                 break;
@@ -372,9 +307,9 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
             latitude = latitude + tmp.getCoordinates().latitude;
             longitude = longitude + tmp.getCoordinates().longitude;
             if(stopCount == 1){/*Capolinea*/
-                busStopArray.add(googleMap.addMarker(new MarkerOptions().title(tmp.getNome()).position(tmp.getCoordinates()).snippet("Linee in Transito: " + tmp.getLineeTransito()).icon(BitmapDescriptorFactory.fromResource(R.mipmap.cap2))));
+                busStopArray.add(googleMap.addMarker(new MarkerOptions().title(tmp.getNome()).position(tmp.getCoordinates()).snippet("Linee in Transito: " + tmp.getLineeTransito()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))));
             }else {
-                busStopArray.add(googleMap.addMarker(new MarkerOptions().title(tmp.getNome()).position(tmp.getCoordinates()).snippet("Linee in Transito: " + tmp.getLineeTransito()).icon(BitmapDescriptorFactory.fromResource(R.mipmap.fer2))));
+                busStopArray.add(googleMap.addMarker(new MarkerOptions().title(tmp.getNome()).position(tmp.getCoordinates()).snippet("Linee in Transito: " + tmp.getLineeTransito()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))));
             }
         }
 
@@ -430,55 +365,6 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         }
     }
 
-
-    private int count = 0;
-
-
-    public ArrayList<BusDescriptor> getBusList(){
-
-        ArrayList<BusDescriptor> lista = new ArrayList();
-        count++;
-        Log.w("getBusList", "count: " + count);
-
-        BusDescriptor tmp = new BusDescriptor("CT051" + count, "201");
-        tmp.setNextBusStop(new FermataDescriptor("NOMEFERMATA1", "IDFERMATA", "molte linee"));
-        tmp.setSpeed(10.2);
-        lista.add(tmp);
-
-        tmp = new BusDescriptor("CT052" + count, "201");
-        tmp.setNextBusStop(new FermataDescriptor("NOMEFERMATA2", "IDFERMATA", "molte linee"));
-        tmp.setSpeed(10.2);
-        lista.add(tmp);
-
-        tmp = new BusDescriptor("CT053" + count, "201");
-        tmp.setNextBusStop(new FermataDescriptor("NOMEFERMATA3", "IDFERMATA", "molte linee"));
-        tmp.setSpeed(10.2);
-        lista.add(tmp);
-
-        tmp = new BusDescriptor("CT061" + count, "201");
-        tmp.setNextBusStop(new FermataDescriptor("NOMEFERMATA4", "IDFERMATA", "molte linee"));
-        tmp.setSpeed(10.2);
-        lista.add(tmp);
-
-        tmp = new BusDescriptor("CT081" + count, "201");
-        tmp.setNextBusStop(new FermataDescriptor("NOMEFERMATA5", "IDFERMATA", "molte linee"));
-        tmp.setSpeed(10.2);
-        lista.add(tmp);
-
-        tmp = new BusDescriptor("CT082" + count, "201");
-        tmp.setNextBusStop(new FermataDescriptor("NOMEFERMATA6", "IDFERMATA", "molte linee"));
-        tmp.setSpeed(10.2);
-        lista.add(tmp);
-
-        return lista;
-    }
-
-    public void sendDataToBusListFragment(){
-        if(busListFragment != null) {
-            busListFragment.refreshBusItemList(getBusList());
-        }
-    }
-
     class BusPositionReceiver extends ResultReceiver{
 
         /**
@@ -527,17 +413,20 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         }
 
         private void manageBusPositionInfoResponce(String busPositionJSON){
+            if(busPositionJSON.compareTo("none") == 0){
+                Log.w("ClientActivity", "No Position received");
+            }else {
+                ArrayList<BusDescriptor> busList = lineaSetup.parseBusPositionJSON(busPositionJSON);
 
-            ArrayList<BusDescriptor> busList = lineaSetup.parseBusPositionJSON(busPositionJSON);
+                if (busList != null && !busList.isEmpty()) {
+                    //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(busList.get(0).getCoordinates(), 13));
+                }
 
-            if(busList != null && !busList.isEmpty()) {
-                //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(busList.get(0).getCoordinates(), 13));
-            }
-
-            printBusMarker(busList);
+                printBusMarker(busList);
 
             /*Manda delle cose fake*/
-            //sendDataToBusListFragment();
+                //sendDataToBusListFragment();
+            }
         }
 
         private void manageBusStopInfoResponce(String busStopJSON){
@@ -587,52 +476,5 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
                 printLinea();
             }
         }
-    }
-
-
-    /**
-     * INNER CLASS to manage fragment pager
-     *
-     *
-     */
-    public static class ClientActivityPagerAdapter extends FragmentPagerAdapter {
-        private static int NUM_ITEMS = 2;
-
-        public ClientActivityPagerAdapter(FragmentManager fragmentManager) {
-            super(fragmentManager);
-        }
-
-        // Returns total number of pages
-        @Override
-        public int getCount() {
-            return NUM_ITEMS;
-        }
-
-        // Returns the fragment to display for that page
-        @Override
-        public Fragment getItem(int position) {
-            switch (position) {
-                case 0: // Fragment # 0 - This will show FirstFragment
-                    return RequestLineaFragment.newInstance(0, " Seleziona Linea");
-                case 1: // Fragment # 0 - This will show FirstFragment different title
-                    return BusListFragment.newInstance(1, "Elenco Autobus");
-                default:
-                    return null;
-            }
-        }
-
-        // Returns the page title for the top indicator
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch(position){
-                case 0:
-                    return "Seleziona Linea";
-                case 1:
-                    return "Elenco autobus";
-                default:
-                    return "Page " + position;
-            }
-        }
-
     }
 }

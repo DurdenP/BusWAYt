@@ -230,6 +230,10 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
                                 }, new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
+                                Bundle bundle = new Bundle();
+                                bundle.putString("response", "none");
+
+                                busTraceReceiver.send(1, bundle);
                                 Toast.makeText(getApplicationContext(),
                                         "That didn't work! BusInfo", Toast.LENGTH_SHORT)
                                         .show();
