@@ -15,4 +15,6 @@
 
     <string name="hello_blank_fragment">Impostazioni linea</string>
 
+    <string name="webserver">http://151.97.157.157:8080/</string>
+
 </resources>

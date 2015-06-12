@@ -201,10 +201,17 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
      */
     @Override
     public void onFragmentInteraction(String cmd, String[] arguments) {
-        Log.d("onFragmentInteraction", cmd);
+
+
+        Log.w("onFragmentInteraction", cmd);
+
         switch(cmd){
             case "traceLinea":
+
                 String message = "città: " + arguments[0] + " linea: " + arguments[1];
+
+                Log.w("onFragmentInton message", message);
+
                 citySelected = arguments[0];
                 centerMapToCitySelected();
                 linea = lineaServiceConnection.getLineaDescriptor(arguments[1], arguments[0]);
@@ -218,7 +225,7 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         switch(citySelected){
             case "Catania":
                 position = new LatLng(37.524940, 15.073690);
-                sendHttpRequest();
+
                 break;
             case "Palermo":
                 position = new LatLng(38.120113, 13.356774);
@@ -234,47 +241,13 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
     }
 
 
-    public void sendHttpRequest()
-    {
 
-        RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="http://151.97.157.157:8080/line";
-
-// Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Display the first 500 characters of the response string.
-
-                        System.out.println(response);
-                        Toast.makeText(getApplicationContext(),
-                                "Response: "+ response.toString(), Toast.LENGTH_LONG)
-                                .show();
-
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                Toast.makeText(getApplicationContext(),
-                        "That didn't work!", Toast.LENGTH_LONG)
-                        .show();
-
-            }
-        });
-// Add the request to the RequestQueue.
-        queue.add(stringRequest);
-
-
-
-    }
 
     /**
      * Disegna il percorso della linea selezionata sulla mappa
      */
     private void printLinea(){
+        Log.w("printLinea", "printLinea ciao");
         printBusStop();
         printRoute();
     }
@@ -430,7 +403,11 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         }
 
         private void manageBusStopInfoResponce(String busStopJSON){
+
+            Log.w("busStopJSON", busStopJSON);
+
             if(lineaSetup.setUpBusStop(linea, parseFermate(busStopJSON))){
+
                 printLinea();
             }
         }
@@ -458,6 +435,7 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
             }
 
             return tmpFermate;
+
         }
 
         /**
@@ -465,11 +443,11 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
          * @param lineaInfoJSON
          */
         private void manageLineaInfoResponce(String lineaInfoJSON){
-            Type listType = new TypeToken<LinkedList<LineaRequestedWrapper>>() {}.getType();
+            Log.w("lineaInfoJSON", lineaInfoJSON);
             Gson reader = new Gson();
 
-            LinkedList<LineaRequestedWrapper> fermateInfo = reader.fromJson(lineaInfoJSON, listType);
-            lineaSetup.parseLineaRequestedWrapper(linea, fermateInfo.getFirst());
+            LineaRequestedWrapper fermateInfo = reader.fromJson(lineaInfoJSON, LineaRequestedWrapper.class);
+            lineaSetup.parseLineaRequestedWrapper(linea, fermateInfo);
             lineaSetup.setUpRoute(linea);
 
             if(linea.isReadyToBePrinted()){

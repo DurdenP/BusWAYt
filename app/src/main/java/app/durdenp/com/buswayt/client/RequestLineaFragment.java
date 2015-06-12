@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.android.volley.*;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
 
 import app.durdenp.com.buswayt.R;
 
@@ -48,6 +49,10 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
 
     private OnFragmentInteractionListener mListener;
 
+    String url;
+
+    Gson gson= new Gson();
+
     /**
      *
      * @param page
@@ -70,6 +75,8 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        url=getResources().getString(R.string.webserver);
+
         if (getArguments() != null) {
             mPage = getArguments().getInt(ARG_PARAM1);
             mTitle = getArguments().getString(ARG_PARAM2);
@@ -139,13 +146,75 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
         /*Abbiamo una sola regione quindi non fa nulla*/
     }
 
+
+    public void sendHttpRequest(String getpath)
+    {
+        String localUrl=url+getpath;
+
+        RequestQueue queue = Volley.newRequestQueue(getActivity());
+
+
+// Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, localUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the first 500 characters of the response string.
+
+
+
+                        lineaBusArray=gson.fromJson(response.toString(), String[].class);
+                        lineaSpinnerAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_item, lineaBusArray);
+                        lineaSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        lineaSpinner.setAdapter(lineaSpinnerAdapter);
+
+//                        for(String s: lineaBusArray)
+//                        {
+//                            Toast.makeText(getActivity(),
+//                                    "lineaBusArray: "+ s, Toast.LENGTH_LONG)
+//                                    .show();
+//
+//                        }
+
+
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                Toast.makeText(getActivity(),
+                        "That didn't work!", Toast.LENGTH_LONG)
+                        .show();
+
+            }
+        });
+// Add the request to the RequestQueue.
+        queue.add(stringRequest);
+
+
+
+
+
+    }
+
+
+
+
     private void changeLineaSpinnerAdapter(){
         //String msg = "citta' selezionata: " + citySelected;
         //Log.d("changeLineaSpinner", msg);
+
+        if(!citySelected.equalsIgnoreCase("Nessuna Città"))
+        sendHttpRequest("line");
+
         switch(citySelected){
             case "Catania":
+
                 //Log.d("changeLineaSpinner", "CASE: catania");
+
                 lineaBusArray = getResources().getStringArray(R.array.linea_catania_array);
+
                 break;
             case "Messina":
                 //Log.d("changeLineaSpinner", "CASE: messina");
@@ -186,6 +255,8 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
 
         /*costruttore*/
         public CitySpinnerListener(){
+
+
 
         }
 

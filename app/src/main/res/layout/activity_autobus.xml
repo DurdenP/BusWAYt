@@ -56,4 +56,17 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="134dp" />
 
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/btn_bg"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:text="Simulation"
+        android:onClick="startSimulation"
+        android:textColor="@color/white"
+        android:layout_above="@+id/button4"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>

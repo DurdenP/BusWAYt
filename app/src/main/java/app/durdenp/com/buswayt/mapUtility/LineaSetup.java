@@ -105,68 +105,69 @@ public class LineaSetup {
 
         //F String processing
 
-        tmpParsedString = lineaWrapper.getF0();
+//        tmpParsedString = lineaWrapper.getF0();
+//
+//        if(tmpParsedString.compareTo("none") != 0){
+//            tmpFcoord.put(0, parseCoordString(tmpParsedString));
+//        }
+//
+//        tmpParsedString = lineaWrapper.getF1();
+//
+//        if(tmpParsedString.compareTo("none") != 0){
+//            tmpFcoord.put(1, parseCoordString(tmpParsedString));
+//        }
+//
+//        tmpParsedString = lineaWrapper.getF2();
+//
+//        if(tmpParsedString.compareTo("none") != 0){
+//            tmpFcoord.put(2, parseCoordString(tmpParsedString));
+//        }
+//
+//        tmpParsedString = lineaWrapper.getF3();
+//
+//        if(tmpParsedString.compareTo("none") != 0){
+//            tmpFcoord.put(3, parseCoordString(tmpParsedString));
+//        }
+//
+//        tmpParsedString = lineaWrapper.getF4();
+//
+//        if(tmpParsedString.compareTo("none") != 0){
+//            tmpFcoord.put(4, parseCoordString(tmpParsedString));
+//        }
+//
+//        tmpParsedString = lineaWrapper.getF5();
+//
+//        if(tmpParsedString.compareTo("none") != 0){
+//            tmpFcoord.put(5, parseCoordString(tmpParsedString));
+//        }
+//
+//        tmpParsedString = lineaWrapper.getF6();
+//
+//        if(tmpParsedString.compareTo("none") != 0){
+//            tmpFcoord.put(6, parseCoordString(tmpParsedString));
+//        }
+//
+//        tmpParsedString = lineaWrapper.getF7();
+//
+//        if(tmpParsedString.compareTo("none") != 0){
+//            tmpFcoord.put(7, parseCoordString(tmpParsedString));
+//        }
+//
+//        tmpParsedString = lineaWrapper.getF8();
+//
+//        if(tmpParsedString.compareTo("none") != 0){
+//            tmpFcoord.put(8, parseCoordString(tmpParsedString));
+//        }
+//
+//        tmpParsedString = lineaWrapper.getF9();
 
-        if(tmpParsedString.compareTo("none") != 0){
-            tmpFcoord.put(0, parseCoordString(tmpParsedString));
-        }
-
-        tmpParsedString = lineaWrapper.getF1();
-
-        if(tmpParsedString.compareTo("none") != 0){
-            tmpFcoord.put(1, parseCoordString(tmpParsedString));
-        }
-
-        tmpParsedString = lineaWrapper.getF2();
-
-        if(tmpParsedString.compareTo("none") != 0){
-            tmpFcoord.put(2, parseCoordString(tmpParsedString));
-        }
-
-        tmpParsedString = lineaWrapper.getF3();
-
-        if(tmpParsedString.compareTo("none") != 0){
-            tmpFcoord.put(3, parseCoordString(tmpParsedString));
-        }
-
-        tmpParsedString = lineaWrapper.getF4();
-
-        if(tmpParsedString.compareTo("none") != 0){
-            tmpFcoord.put(4, parseCoordString(tmpParsedString));
-        }
-
-        tmpParsedString = lineaWrapper.getF5();
-
-        if(tmpParsedString.compareTo("none") != 0){
-            tmpFcoord.put(5, parseCoordString(tmpParsedString));
-        }
-
-        tmpParsedString = lineaWrapper.getF6();
-
-        if(tmpParsedString.compareTo("none") != 0){
-            tmpFcoord.put(6, parseCoordString(tmpParsedString));
-        }
-
-        tmpParsedString = lineaWrapper.getF7();
-
-        if(tmpParsedString.compareTo("none") != 0){
-            tmpFcoord.put(7, parseCoordString(tmpParsedString));
-        }
-
-        tmpParsedString = lineaWrapper.getF8();
-
-        if(tmpParsedString.compareTo("none") != 0){
-            tmpFcoord.put(8, parseCoordString(tmpParsedString));
-        }
-
-        tmpParsedString = lineaWrapper.getF9();
-
-        if(tmpParsedString.compareTo("none") != 0){
-            tmpFcoord.put(9, parseCoordString(tmpParsedString));
-        }
+//        if(tmpParsedString.compareTo("none") != 0){
+//            tmpFcoord.put(9, parseCoordString(tmpParsedString));
+//        }
 
         linea.setpCoord(tmpPcoord);
-        linea.setfCoord(tmpFcoord);
+
+        //linea.setfCoord(tmpFcoord);
 
     }
 
@@ -262,6 +263,9 @@ public class LineaSetup {
         LinkedList<FermataDescriptor> busStopNotOrdered = busStops;
         LinkedList<FermataDescriptor> busStopOrdered = new LinkedList();
 
+        Log.w("pCoord size", String.valueOf(pCoord.size()));
+        Log.w("pCoord", pCoord.toString());
+
         int pSize = pCoord.size();
         for(int i = 0; i<pSize; i++){
             LinkedList<LatLng> partialRoute = pCoord.get(i);
@@ -271,8 +275,12 @@ public class LineaSetup {
 
                 ListIterator<FermataDescriptor> fermateIt = busStopNotOrdered.listIterator();
 
+                Log.w("fermateIt", fermateIt.toString());
+
                 while(fermateIt.hasNext()){
                     FermataDescriptor tmp = fermateIt.next();
+
+                    Log.w("FermataDescriptor tmp", tmp.toString());
                     if(match(tmp.getCoordinates(), tmpCoord)){
                         busStopOrdered.addLast(tmp);
                         fermateIt.remove();
@@ -295,6 +303,8 @@ public class LineaSetup {
      * @return
      */
     private boolean match(LatLng coord1, LatLng coord2){
+        Log.w("coord1",coord1.toString());
+        Log.w("coord2",coord2.toString());
         String latitude1 = Double.toString(coord1.latitude).substring(0, 6);
         String latitude2 = Double.toString(coord2.latitude).substring(0, 6);
         if(latitude1.compareTo(latitude2) == 0){
