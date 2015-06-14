@@ -133,7 +133,7 @@ public class BusConfigActivity extends ActionBarActivity {
 
             @Override
             public void onResponse(JSONObject response) {
-                Log.d("Response: ", response.toString());
+//                Log.d("Response: ", response.toString());
 
                 Toast.makeText(getApplicationContext(),
                         "Response: "+ response.toString(), Toast.LENGTH_LONG)

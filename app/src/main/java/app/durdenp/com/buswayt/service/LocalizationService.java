@@ -239,6 +239,7 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
 
 
 
+
     }
 
 
@@ -391,7 +392,7 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
 
         timer = new Timer();
         initializeTimerTask();
-        timer.schedule(busLocationTask, 1000, 1000);
+        timer.schedule(busLocationTask, 1000, 3000);
     }
 
     public void initializeTimerTask() {

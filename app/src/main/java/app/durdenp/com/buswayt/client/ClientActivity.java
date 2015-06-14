@@ -203,14 +203,12 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
     public void onFragmentInteraction(String cmd, String[] arguments) {
 
 
-        Log.w("onFragmentInteraction", cmd);
 
         switch(cmd){
             case "traceLinea":
 
                 String message = "città: " + arguments[0] + " linea: " + arguments[1];
 
-                Log.w("onFragmentInton message", message);
 
                 citySelected = arguments[0];
                 centerMapToCitySelected();
@@ -247,7 +245,6 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
      * Disegna il percorso della linea selezionata sulla mappa
      */
     private void printLinea(){
-        Log.w("printLinea", "printLinea ciao");
         printBusStop();
         printRoute();
     }
@@ -280,9 +277,9 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
             latitude = latitude + tmp.getCoordinates().latitude;
             longitude = longitude + tmp.getCoordinates().longitude;
             if(stopCount == 1){/*Capolinea*/
-                busStopArray.add(googleMap.addMarker(new MarkerOptions().title(tmp.getNome()).position(tmp.getCoordinates()).snippet("Linee in Transito: " + tmp.getLineeTransito()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))));
+                busStopArray.add(googleMap.addMarker(new MarkerOptions().title(tmp.getNome()).position(tmp.getCoordinates()).snippet("Linee in Transito: " + tmp.getLineeTransito()).icon(BitmapDescriptorFactory.fromResource(R.mipmap.station100))));
             }else {
-                busStopArray.add(googleMap.addMarker(new MarkerOptions().title(tmp.getNome()).position(tmp.getCoordinates()).snippet("Linee in Transito: " + tmp.getLineeTransito()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))));
+                busStopArray.add(googleMap.addMarker(new MarkerOptions().title(tmp.getNome()).position(tmp.getCoordinates()).snippet("Linee in Transito: " + tmp.getLineeTransito()).icon(BitmapDescriptorFactory.fromResource(R.mipmap.busstop1))));
             }
         }
 
@@ -296,7 +293,6 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
     private void printRoute(){
         LinkedList<LatLng> route = linea.getRoute();
 
-        Log.w("printRoute:size - ", Integer.toString(route.size()));
         if(routeLineArray == null){
             routeLineArray = new ArrayList();
         }
@@ -334,7 +330,7 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         }
 
         for(BusDescriptor tmpDesc : bus){
-            busMarker.add(googleMap.addMarker(new MarkerOptions().title(tmpDesc.getId()).position(tmpDesc.getCoordinates()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))));
+            busMarker.add(googleMap.addMarker(new MarkerOptions().title(tmpDesc.getId()).position(tmpDesc.getCoordinates()).icon(BitmapDescriptorFactory.fromResource(R.mipmap.icon100))));
         }
     }
 
@@ -404,7 +400,6 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
 
         private void manageBusStopInfoResponce(String busStopJSON){
 
-            Log.w("busStopJSON", busStopJSON);
 
             if(lineaSetup.setUpBusStop(linea, parseFermate(busStopJSON))){
 
@@ -443,7 +438,6 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
          * @param lineaInfoJSON
          */
         private void manageLineaInfoResponce(String lineaInfoJSON){
-            Log.w("lineaInfoJSON", lineaInfoJSON);
             Gson reader = new Gson();
 
             LineaRequestedWrapper fermateInfo = reader.fromJson(lineaInfoJSON, LineaRequestedWrapper.class);
