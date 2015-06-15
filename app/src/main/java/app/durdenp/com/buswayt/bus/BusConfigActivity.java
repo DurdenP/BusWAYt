@@ -17,37 +17,24 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import app.durdenp.com.buswayt.R;
 
 public class BusConfigActivity extends ActionBarActivity {
-    String address="http://151.97.157.157:8080/";
+
+    String url;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        url=getResources().getString(R.string.webserver);
         setContentView(R.layout.activity_bus_config);
         loadSavedPreferences();
     }
@@ -135,7 +122,7 @@ public class BusConfigActivity extends ActionBarActivity {
 
 
     public void sendHttpRequest(String path, String busid, String lineaid)  {
-        String url =address+path;
+        String url = this.url +path;
 
         RequestQueue queue = Volley.newRequestQueue(this);
         Map<String, String> params = new HashMap<String, String>();
@@ -146,7 +133,7 @@ public class BusConfigActivity extends ActionBarActivity {
 
             @Override
             public void onResponse(JSONObject response) {
-                Log.d("Response: ", response.toString());
+//                Log.d("Response: ", response.toString());
 
                 Toast.makeText(getApplicationContext(),
                         "Response: "+ response.toString(), Toast.LENGTH_LONG)

@@ -19,7 +19,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="42dp"
-        android:textSize="25dp" />
+        android:textSize="15dp" />
 
     <Spinner
         android:layout_width="wrap_content"
@@ -37,15 +37,15 @@
         android:layout_below="@+id/cityChooseSpinner"
         android:layout_alignParentStart="true"
         android:layout_marginTop="46dp"
-        android:textSize="25dp" />
+        android:textSize="15dp" />
 
     <Spinner
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/lineaChooseSpinner"
         android:layout_alignTop="@+id/lineaChooseLabel"
-        android:layout_alignParentEnd="true"
-        android:layout_alignStart="@+id/cityChooseSpinner" />
+        android:layout_alignStart="@+id/traceLineaBtn"
+        android:layout_marginStart="43dp" />
 
     <Button
         android:layout_width="wrap_content"
@@ -53,7 +53,6 @@
         android:text="Visualizza Linea"
         android:id="@+id/traceLineaBtn"
         android:textColor="@color/white"
-        android:layout_marginBottom="48dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 

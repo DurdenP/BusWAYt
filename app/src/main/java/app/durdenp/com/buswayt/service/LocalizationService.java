@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Binder;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -14,6 +15,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -21,16 +23,27 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import app.durdenp.com.buswayt.R;
 import app.durdenp.com.buswayt.bus.CustomRequest;
+import app.durdenp.com.buswayt.jsonWrapper.LineaRequestedWrapper;
+import app.durdenp.com.buswayt.mapUtility.LineaDescriptor;
+import app.durdenp.com.buswayt.mapUtility.LineaSetup;
 
 public class LocalizationService extends Service implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
+
+    String url;
 
     // LogCat tag
     private static final String TAG = LocalizationService.class.getSimpleName();
@@ -40,9 +53,6 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
     private GoogleApiClient mGoogleApiClient;
 
     private boolean mRequestingLocationUpdates = false;
-
-    String address="http://151.97.157.157:8080/";
-
 
     private LocationRequest mLocationRequest;
 
@@ -57,6 +67,17 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
 
     private final IBinder mBinder = new LocalBinder();
 
+
+
+    Timer timer;
+    TimerTask busLocationTask;
+    final Handler handler = new Handler();
+    int currentPositionHashmap;
+    int currentPositionLinkedlist;
+
+    LineaDescriptor linea=new LineaDescriptor();
+    LineaSetup ls;
+
     public class LocalBinder extends Binder {
         public LocalizationService getService() {
             return LocalizationService.this;
@@ -66,6 +87,7 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
 
     @Override
     public void onCreate(){
+        url=getResources().getString(R.string.webserver);
 
         // First we need to check availability of play services
         if (checkPlayServices()) {
@@ -82,6 +104,7 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
         }
         Toast.makeText(getApplicationContext(),
                 "Il Localization service e' partito", Toast.LENGTH_LONG).show();
+
 
     }
 
@@ -183,7 +206,7 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
 
     public void sendHttpRequest(String busid, String lineaid, double latitude, double longitude, float speed)
     {
-        String url =address+"businfo";
+        String url = this.url +"businfo";
 
         RequestQueue queue = Volley.newRequestQueue(this);
         Map<String, String> params = new HashMap<>();
@@ -213,6 +236,7 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
         });
 
         queue.add(jsObjRequest);
+
 
 
 
@@ -318,7 +342,112 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
     }
 
 
+
+
+
+
+    public void sendLineaInfoRequest() {
+        linea.setId(lineaid);
+        ls= new LineaSetup();
+
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        String path="routeinfo?linea="+lineaid;
+        String localurl = url +path;
+
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, localurl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Receive the responce and send it to activity because through bundle
+                        // we can only pass flat data
+                        Gson reader = new Gson();
+
+                        LineaRequestedWrapper fermateInfo = reader.fromJson(response, LineaRequestedWrapper.class);
+                        ls.parseLineaRequestedWrapper(linea, fermateInfo);
+                        sendRequest();
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(),
+                        "That didn't work!", Toast.LENGTH_SHORT)
+                        .show();
+            }
+        });
+        queue.add(stringRequest);
     }
+
+
+
+    private void sendRequest(){
+        currentPositionHashmap=0;
+        currentPositionLinkedlist=0;
+
+        if(timer != null){
+            timer.cancel();
+            timer = null;
+        }
+
+        timer = new Timer();
+        initializeTimerTask();
+        timer.schedule(busLocationTask, 1000, 3000);
+    }
+
+    public void initializeTimerTask() {
+
+        busLocationTask = new TimerTask() {
+
+            public void run() {
+
+                //use a handler to run a toast that shows the current timestamp
+
+                handler.post(new Runnable() {
+
+                    public void run() {
+                        int size= linea.getpCoord().size();
+
+                        if(currentPositionHashmap<size)
+                        {
+                            LinkedList<LatLng> coordList=linea.getpCoord().get(currentPositionHashmap);
+
+                            if(currentPositionLinkedlist<coordList.size())
+                            {
+                                LatLng ltnlng=coordList.get(currentPositionLinkedlist);
+
+                                /*send to ws*/
+                                sendHttpRequest(busid,lineaid, ltnlng.latitude, ltnlng.longitude,100);
+
+                                currentPositionLinkedlist++;
+
+                            }
+                            else
+                            {
+                                currentPositionHashmap++;
+                                currentPositionLinkedlist=0;
+
+
+                            }
+
+
+                        }
+
+                        else
+                        {
+
+                            currentPositionHashmap=0;
+                            currentPositionLinkedlist=0;
+                        }
+
+
+
+                    }
+                });
+            }
+        };
+
+    }}
 
 
 

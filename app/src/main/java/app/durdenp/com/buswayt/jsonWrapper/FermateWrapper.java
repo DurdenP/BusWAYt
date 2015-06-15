@@ -16,10 +16,10 @@ import java.util.ArrayList;
  * Created by Marco on 26/05/2015.
  */
 public class FermateWrapper {
-    @SerializedName("Codice") String codice;
-    @SerializedName("Descrizione") String descrizione;
-    @SerializedName("Latitudine") double latitude;
-    @SerializedName("Longitudine") double longitude;
+    @SerializedName("codice") String codice;
+    @SerializedName("descrizione") String descrizione;
+    @SerializedName("latitudine") double latitude;
+    @SerializedName("longitudine") double longitude;
     @SerializedName("LineeTransito") String lineeTransito;
     int ps;
 

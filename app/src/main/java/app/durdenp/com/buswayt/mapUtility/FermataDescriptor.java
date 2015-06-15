@@ -20,6 +20,7 @@ public class FermataDescriptor {
         coordinates = new LatLng(0.0, 0.0);
     }
 
+
     /*Constructor*/
     public FermataDescriptor(String nome, String id, String lineeTransito){
         this.nome = nome;
@@ -99,4 +100,5 @@ public class FermataDescriptor {
     public void setLineeTransito(String lineeTransito) {
         this.lineeTransito = lineeTransito;
     }
+
 }

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.ResultReceiver;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -21,23 +22,24 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import app.durdenp.com.buswayt.R;
 import app.durdenp.com.buswayt.mapUtility.LineaDescriptor;
 
 public class LineaMonitoringService extends Service implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
+    String url;
     private final IBinder mBinder = new LocalBinder();
-
 
     //Linea and bus tracked
     private ResultReceiver busTraceReceiver;
     private String city;
     private String idLinea;
-    private String busID = "14a";
 
     private Timer timer;
     private TimerTask busTracerTask;
     final Handler handler = new Handler();
+
 
     //TODO delete this counter when the webservice is active
     private int count = 0;
@@ -69,6 +71,9 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
 
     @Override
     public void onCreate(){
+
+        url=getResources().getString(R.string.webserver);
+
         Toast.makeText(getApplicationContext(),
                 "Il service e' stato creato", Toast.LENGTH_LONG).show();
     }
@@ -99,6 +104,8 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
         sendBusStopRequest();
         sendLineaInfoRequest();
 
+
+
         return tmp;
     }
 
@@ -112,13 +119,16 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
      * Send fermate of selected linea to activity   CODE: 2
      */
     private void sendBusStopRequest() {
-        String mLinea = "l"+idLinea;
+
+        String mLinea = "busstationinfo?linea="+idLinea;
+        String localurl =url+mLinea;
+
 
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        String url = getStringResourceByName(mLinea);
+
 
         // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, localurl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -148,11 +158,12 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
     private void sendLineaInfoRequest() {
 
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        //String url = "http://localhost:8080/line";
-        String url = "http://www.amt.ct.it/MappaLinee/leggilineerichiestej.php?linee='"+idLinea+"','xx'";
+
+        String path="routeinfo?linea="+idLinea;
+        String localurl = url+path;
 
         // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, localurl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -189,6 +200,7 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
         timer = new Timer();
         initializeTimerTask();
         timer.schedule(busTracerTask, 1000, 1000);
+
     }
 
     public void initializeTimerTask() {
@@ -203,20 +215,18 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
 
                     public void run() {
                         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-                        String url = "";
 
-                        if(busID != null) {
+                        String path="lineinfo?linea=";
+                        String localurl =url+path;
+
+                        if(idLinea != null) {
                             // faccio richiesta solo per lo specifico bus
-                            url = "http://151.97.157.200:8080/lineinfo?linea="+ busID;
-                            //url = "http://151.97.63.136:8080/lineinfo?linea="+ busID;
-                        } else {
-                            //   faccio richiesta per tutti i bus della linea
-                            url = "http://151.97.157.200:8080/lineinfo?linea="+ busID;
+                            localurl = localurl + idLinea;
                             //url = "http://151.97.63.136:8080/lineinfo?linea="+ busID;
                         }
 
                         // Request a string response from the provided URL.
-                        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                        StringRequest stringRequest = new StringRequest(Request.Method.GET, localurl,
                                 new Response.Listener<String>() {
                                     @Override
                                     public void onResponse(String response) {
