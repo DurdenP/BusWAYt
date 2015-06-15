@@ -100,6 +100,8 @@ public class BusConfigActivity extends ActionBarActivity {
 
         else{
             Toast.makeText(this, "Preferenze NON salvate", Toast.LENGTH_LONG).show();
+            bus = (EditText) findViewById(R.id.busIdEditText);
+            linea= (EditText)findViewById(R.id.LineaIdEditText2);
         }
 
 

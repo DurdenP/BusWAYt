@@ -75,6 +75,8 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
     int currentPositionHashmap;
     int currentPositionLinkedlist;
 
+    RequestQueue queue;
+
     LineaDescriptor linea=new LineaDescriptor();
     LineaSetup ls;
 
@@ -88,6 +90,9 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
     @Override
     public void onCreate(){
         url=getResources().getString(R.string.webserver);
+
+        queue = Volley.newRequestQueue(this);
+
 
         // First we need to check availability of play services
         if (checkPlayServices()) {
@@ -208,7 +213,7 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
     {
         String url = this.url +"businfo";
 
-        RequestQueue queue = Volley.newRequestQueue(this);
+
         Map<String, String> params = new HashMap<>();
         params.put("speed", String.valueOf(speed));
         params.put("longitude", String.valueOf(longitude));
@@ -222,6 +227,7 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
             public void onResponse(JSONObject response) {
                 Log.d("Response: ", response.toString());
 
+
                 Toast.makeText(getApplicationContext(),
                         "Response: "+ response.toString(), Toast.LENGTH_LONG)
                         .show();
@@ -231,7 +237,7 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
 
             @Override
             public void onErrorResponse(VolleyError response) {
-                Log.d("Error Response: ", response.toString());
+                //Log.d("Error Response: ", response.toString());
             }
         });
 
@@ -347,10 +353,14 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
 
 
     public void sendLineaInfoRequest() {
+
+        Toast.makeText(getApplicationContext(),
+                "Start Demo!", Toast.LENGTH_LONG)
+                .show();
+
         linea.setId(lineaid);
         ls= new LineaSetup();
 
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String path="routeinfo?linea="+lineaid;
         String localurl = url +path;
 
@@ -392,7 +402,7 @@ public class LocalizationService extends Service implements GoogleApiClient.Conn
 
         timer = new Timer();
         initializeTimerTask();
-        timer.schedule(busLocationTask, 1000, 3000);
+        timer.schedule(busLocationTask, 1000, 1000);
     }
 
     public void initializeTimerTask() {

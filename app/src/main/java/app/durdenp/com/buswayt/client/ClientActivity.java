@@ -277,9 +277,9 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
             latitude = latitude + tmp.getCoordinates().latitude;
             longitude = longitude + tmp.getCoordinates().longitude;
             if(stopCount == 1){/*Capolinea*/
-                busStopArray.add(googleMap.addMarker(new MarkerOptions().title(tmp.getNome()).position(tmp.getCoordinates()).snippet("Linee in Transito: " + tmp.getLineeTransito()).icon(BitmapDescriptorFactory.fromResource(R.mipmap.station100))));
+                busStopArray.add(googleMap.addMarker(new MarkerOptions().title(tmp.getNome()).position(tmp.getCoordinates()).icon(BitmapDescriptorFactory.fromResource(R.mipmap.station100))));
             }else {
-                busStopArray.add(googleMap.addMarker(new MarkerOptions().title(tmp.getNome()).position(tmp.getCoordinates()).snippet("Linee in Transito: " + tmp.getLineeTransito()).icon(BitmapDescriptorFactory.fromResource(R.mipmap.busstop1))));
+                busStopArray.add(googleMap.addMarker(new MarkerOptions().title(tmp.getNome()).position(tmp.getCoordinates()).icon(BitmapDescriptorFactory.fromResource(R.mipmap.busstop1))));
             }
         }
 
@@ -319,19 +319,39 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
      * @param bus
      */
     private void printBusMarker(ArrayList<BusDescriptor> bus){
+
+        for(BusDescriptor bs: bus)
+        {
+            Log.w("BusDescriptor: ", bs.toString());
+
+        }
+
+
+
         if(busMarker == null){
             busMarker = new ArrayList();
         }
 
         if(!busMarker.isEmpty()){
             for(Marker tmp : busMarker){
+
                 tmp.remove();
+
             }
+            busMarker.clear();
         }
 
         for(BusDescriptor tmpDesc : bus){
-            busMarker.add(googleMap.addMarker(new MarkerOptions().title(tmpDesc.getId()).position(tmpDesc.getCoordinates()).icon(BitmapDescriptorFactory.fromResource(R.mipmap.icon100))));
+
+
+            Marker marker=googleMap.addMarker(new MarkerOptions().title(tmpDesc.getId()).position(tmpDesc.getCoordinates()).icon(BitmapDescriptorFactory.fromResource(R.mipmap.icon100black)));
+            marker.showInfoWindow();
+
+            busMarker.add(marker);
+
         }
+
+
     }
 
     class BusPositionReceiver extends ResultReceiver{
@@ -387,6 +407,8 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
             }else {
                 ArrayList<BusDescriptor> busList = lineaSetup.parseBusPositionJSON(busPositionJSON);
 
+
+
                 if (busList != null && !busList.isEmpty()) {
                     //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(busList.get(0).getCoordinates(), 13));
                 }
@@ -421,16 +443,19 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
             LinkedList<FermateWrapper> fermate = reader.fromJson(inputJSON, listType);
 
             LinkedList<FermataDescriptor> tmpFermate = new LinkedList();
+            if(fermate!=null) {
 
-            ListIterator<FermateWrapper> it = fermate.listIterator();
-            while(it.hasNext()){
-                FermateWrapper tmpVect = it.next();
-                FermataDescriptor tmp = new FermataDescriptor(tmpVect.getDescrizione(), tmpVect.getCodice(), tmpVect.getLineeTransito(), new LatLng(tmpVect.getLatitude(), tmpVect.getLongitude()));
-                tmpFermate.add(tmp);
+
+                ListIterator<FermateWrapper> it = fermate.listIterator();
+                while (it.hasNext()) {
+                    FermateWrapper tmpVect = it.next();
+                    FermataDescriptor tmp = new FermataDescriptor(tmpVect.getDescrizione(), tmpVect.getCodice(), tmpVect.getLineeTransito(), new LatLng(tmpVect.getLatitude(), tmpVect.getLongitude()));
+                    tmpFermate.add(tmp);
+                }
+
+
             }
-
             return tmpFermate;
-
         }
 
         /**

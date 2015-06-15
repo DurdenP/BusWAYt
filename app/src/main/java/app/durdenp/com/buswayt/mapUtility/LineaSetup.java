@@ -263,8 +263,8 @@ public class LineaSetup {
         LinkedList<FermataDescriptor> busStopNotOrdered = busStops;
         LinkedList<FermataDescriptor> busStopOrdered = new LinkedList();
 
-        Log.w("pCoord size", String.valueOf(pCoord.size()));
-        Log.w("pCoord", pCoord.toString());
+        //Log.w("pCoord size", String.valueOf(pCoord.size()));
+        //Log.w("pCoord", pCoord.toString());
 
         int pSize = pCoord.size();
         for(int i = 0; i<pSize; i++){
@@ -275,12 +275,12 @@ public class LineaSetup {
 
                 ListIterator<FermataDescriptor> fermateIt = busStopNotOrdered.listIterator();
 
-                Log.w("fermateIt", fermateIt.toString());
+                //Log.w("fermateIt", fermateIt.toString());
 
                 while(fermateIt.hasNext()){
                     FermataDescriptor tmp = fermateIt.next();
 
-                    Log.w("FermataDescriptor tmp", tmp.toString());
+                    //Log.w("FermataDescriptor tmp", tmp.toString());
                     if(match(tmp.getCoordinates(), tmpCoord)){
                         busStopOrdered.addLast(tmp);
                         fermateIt.remove();
@@ -303,8 +303,8 @@ public class LineaSetup {
      * @return
      */
     private boolean match(LatLng coord1, LatLng coord2){
-        Log.w("coord1",coord1.toString());
-        Log.w("coord2",coord2.toString());
+        //Log.w("coord1",coord1.toString());
+        //Log.w("coord2",coord2.toString());
         String latitude1 = Double.toString(coord1.latitude).substring(0, 6);
         String latitude2 = Double.toString(coord2.latitude).substring(0, 6);
         if(latitude1.compareTo(latitude2) == 0){
