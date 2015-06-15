@@ -330,7 +330,13 @@ public class ClientActivity extends ActionBarActivity implements RequestLineaFra
         }
 
         for(BusDescriptor tmpDesc : bus){
+
             busMarker.add(googleMap.addMarker(new MarkerOptions().title(tmpDesc.getId()).position(tmpDesc.getCoordinates()).icon(BitmapDescriptorFactory.fromResource(R.mipmap.icon100))));
+        }
+
+        for(Marker tmp : busMarker){
+
+            tmp.showInfoWindow();
         }
     }
 

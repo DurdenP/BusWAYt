@@ -13,6 +13,8 @@ public class BusDescriptor {
     private FermataDescriptor lastBusStop;
     private FermataDescriptor nextBusStop;
 
+
+
     /**
      * Default Constructor
      */
