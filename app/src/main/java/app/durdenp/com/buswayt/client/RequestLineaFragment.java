@@ -142,6 +142,7 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
     private void changeLineaSpinnerAdapter(){
         //String msg = "citta' selezionata: " + citySelected;
         //Log.d("changeLineaSpinner", msg);
+
         switch(citySelected){
             case "Catania":
                 //Log.d("changeLineaSpinner", "CASE: catania");
@@ -220,4 +221,32 @@ public class RequestLineaFragment extends Fragment implements Button.OnClickList
         }
     }
 
+    /**
+     * Send request to webservice to get the List of bus List in the city
+     */
+    private void requestListLinea(){
+
+        RequestQueue queue = Volley.newRequestQueue(getActivity());
+        //String url = "http://localhost:8080/line";
+
+
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Toast.makeText(getActivity(),
+                                "That work!", Toast.LENGTH_SHORT)
+                                .show();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getActivity(),
+                        "That didn't work!", Toast.LENGTH_SHORT)
+                        .show();
+            }
+        });
+        queue.add(stringRequest);
+    }
 }
