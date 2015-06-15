@@ -39,6 +39,7 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
     private Timer timer;
     private TimerTask busTracerTask;
     final Handler handler = new Handler();
+    RequestQueue queue;
 
 
     //TODO delete this counter when the webservice is active
@@ -73,6 +74,7 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
     public void onCreate(){
 
         url=getResources().getString(R.string.webserver);
+        queue= Volley.newRequestQueue(getApplicationContext());
 
         Toast.makeText(getApplicationContext(),
                 "Il service e' stato creato", Toast.LENGTH_LONG).show();
@@ -124,7 +126,7 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
         String localurl =url+mLinea;
 
 
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+//        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
 
 
         // Request a string response from the provided URL.
@@ -157,7 +159,7 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
      */
     private void sendLineaInfoRequest() {
 
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+//        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
 
         String path="routeinfo?linea="+idLinea;
         String localurl = url+path;
@@ -214,7 +216,8 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
                 handler.post(new Runnable() {
 
                     public void run() {
-                        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+
+
 
                         String path="lineinfo?linea=";
                         String localurl =url+path;
@@ -230,10 +233,14 @@ public class LineaMonitoringService extends Service implements GoogleApiClient.C
                                 new Response.Listener<String>() {
                                     @Override
                                     public void onResponse(String response) {
+
                                         // Receive the responce and send it to activity because through bundle
                                         // we can only pass flat data
                                         Bundle bundle = new Bundle();
                                         bundle.putString("response", response);
+
+                                        Log.w("RESPONSE: ", response.toString());
+
                                         busTraceReceiver.send(1, bundle);
 
                                     }

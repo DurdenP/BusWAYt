@@ -216,4 +216,16 @@ public class BusDescriptor {
         //TODO implment this method
         return 0.0;
     }
+
+    @Override
+    public String toString() {
+        return "BusDescriptor{" +
+                "id='" + id + '\'' +
+                ", linea='" + linea + '\'' +
+                ", coordinates=" + coordinates +
+                ", speed=" + speed +
+                ", lastBusStop=" + lastBusStop +
+                ", nextBusStop=" + nextBusStop +
+                '}';
+    }
 }
